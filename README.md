@@ -7,40 +7,151 @@ use npm.cmd like:
 npm run dev
 ```
 
-## Base Folders
+```
+e-learning-fe
+├─ .prettierignore
+├─ AGENTS.md
+├─ CLAUDE.md
+├─ DESIGN_Appple.md
+├─ eslint.config.mjs
+├─ next.config.ts
+├─ package-lock.json
+├─ package.json
+├─ postcss.config.mjs
+├─ prettier.config.js
+├─ public
+│  ├─ file.svg
+│  ├─ globe.svg
+│  ├─ icons
+│  ├─ images
+│  │  ├─ AI.png
+│  │  ├─ auth-illustration.png
+│  │  ├─ home-learning-workspace.png
+│  │  ├─ logo.png
+│  │  ├─ logo.svg
+│  │  ├─ nestjs.png
+│  │  └─ nextjs.png
+│  ├─ next.svg
+│  ├─ vercel.svg
+│  └─ window.svg
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ auth
+│  │  │  └─ google
+│  │  │     └─ success
+│  │  │        └─ page.tsx
+│  │  ├─ courses
+│  │  │  ├─ page.tsx
+│  │  │  └─ [slug]
+│  │  │     ├─ page.tsx
+│  │  │     └─ payment
+│  │  │        └─ page.tsx
+│  │  ├─ favicon.ico
+│  │  ├─ forgot-password
+│  │  │  └─ page.tsx
+│  │  ├─ layout.tsx
+│  │  ├─ login
+│  │  │  └─ page.tsx
+│  │  ├─ my-courses
+│  │  │  └─ page.tsx
+│  │  ├─ page.tsx
+│  │  ├─ register
+│  │  │  └─ page.tsx
+│  │  ├─ reset-password
+│  │  │  └─ page.tsx
+│  │  └─ _components
+│  │     ├─ home-content.ts
+│  │     ├─ home-page.tsx
+│  │     └─ sections
+│  │        ├─ featured-courses-section.tsx
+│  │        ├─ final-cta-section.tsx
+│  │        ├─ hero-section.tsx
+│  │        ├─ role-section.tsx
+│  │        └─ stats-section.tsx
+│  ├─ components
+│  │  ├─ layout
+│  │  │  └─ public-navbar
+│  │  │     ├─ auth-actions.tsx
+│  │  │     ├─ brand-link.tsx
+│  │  │     ├─ desktop-nav.tsx
+│  │  │     ├─ mobile-nav-link.tsx
+│  │  │     ├─ nav-link.tsx
+│  │  │     ├─ public-navbar.tsx
+│  │  │     └─ user-menu.tsx
+│  │  ├─ shared
+│  │  └─ ui
+│  │     ├─ badge.tsx
+│  │     ├─ button-link.tsx
+│  │     ├─ README.md
+│  │     └─ section-header.tsx
+│  ├─ features
+│  │  ├─ admin
+│  │  ├─ auth
+│  │  │  ├─ api
+│  │  │  │  └─ auth-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ auth-illustration.tsx
+│  │  │  │  ├─ auth-page-shell.tsx
+│  │  │  │  ├─ forgot-password-form.tsx
+│  │  │  │  ├─ google-auth-button.tsx
+│  │  │  │  ├─ google-auth-success.tsx
+│  │  │  │  ├─ guest-only-route.tsx
+│  │  │  │  ├─ login-form.tsx
+│  │  │  │  ├─ protected-route.tsx
+│  │  │  │  ├─ register-form.tsx
+│  │  │  │  ├─ reset-password-form.tsx
+│  │  │  │  └─ role-protected-route.tsx
+│  │  │  ├─ hooks
+│  │  │  │  └─ use-auth.ts
+│  │  │  └─ types
+│  │  │     └─ auth.ts
+│  │  ├─ categories
+│  │  ├─ courses
+│  │  │  ├─ api
+│  │  │  │  └─ course-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ course-card.tsx
+│  │  │  │  ├─ course-catalog-state.tsx
+│  │  │  │  ├─ course-detail.tsx
+│  │  │  │  ├─ course-filter-summary.tsx
+│  │  │  │  ├─ course-filters.tsx
+│  │  │  │  ├─ course-grid.tsx
+│  │  │  │  ├─ course-image.tsx
+│  │  │  │  ├─ course-pagination.tsx
+│  │  │  │  ├─ course-search.tsx
+│  │  │  │  └─ courses-header.tsx
+│  │  │  ├─ types
+│  │  │  │  └─ course.ts
+│  │  │  └─ utils
+│  │  │     └─ course-data.ts
+│  │  ├─ enrollments
+│  │  │  ├─ api
+│  │  │  │  └─ enrollment-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ enrollment-cta.tsx
+│  │  │  │  ├─ my-course-card.tsx
+│  │  │  │  ├─ my-courses-content.tsx
+│  │  │  │  ├─ my-courses-pagination.tsx
+│  │  │  │  └─ payment-checkout.tsx
+│  │  │  └─ types
+│  │  │     └─ enrollment.ts
+│  │  ├─ instructor
+│  │  ├─ learning
+│  │  └─ users
+│  ├─ hooks
+│  ├─ lib
+│  │  ├─ api
+│  │  │  ├─ client.ts
+│  │  │  └─ README.md
+│  │  └─ config
+│  │     └─ env.ts
+│  ├─ providers
+│  │  └─ auth-provider.tsx
+│  ├─ styles
+│  │  └─ globals.css
+│  └─ types
+│     └─ api.ts
+└─ tsconfig.json
 
-- `src/app/`: Next App Router routes and layouts only.
-- `src/components/ui/`: reusable primitive UI components later.
-- `src/components/layout/`: app shells, headers, sidebars later.
-- `src/components/shared/`: generic shared UI states later.
-- `src/features/`: feature-owned code, grouped by domain.
-- `src/lib/`: framework-independent helpers such as API/auth/config later.
-- `src/hooks/`: reusable React hooks later.
-- `src/providers/`: app-level providers later.
-- `src/types/`: shared TypeScript types later.
-- `public/images/`, `public/icons/`: static assets.
-
-## rules:
-
-1. `/src/app`
-   app/ should route and compose.
-2. `/src/componets/ui`
-   components/ui/ must be business-blind.
-3. `src/components/layout
-   components/layout/ is for reusable page structure, not business features.
-4. `src/components/shared
-   shared/ can be reusable, but it should not become a trash folder.
-5. `src/features
-   features/ should contain the real feature logic.
-   If a file belongs to one business domain, put it in features/[domain]/.
-6. `src/lib`
-   `lib/` is for **shared helper code**.
-7. `src/hooks
-   Global reusable hook -> src/hooks/Feature-specific hook -> src/features/[feature]/hooks/
-8. `src/providers/`
-   providers/ is for global wrappers used near root layout.
-9. `src/types
-   Used by many features? -> src/types/
-   Used by one feature only? -> src/features/[feature]/types/
-10. `public/images/` and `public/icons/`
-    public/ is for static app assets, not dynamic user-uploaded files.
+```
