@@ -20,7 +20,7 @@ const inputClasses =
 const levels = ["BEGINNER", "INTERMEDIATE", "ADVANCE", "ALL_LEVELS"] as const;
 
 const sortOptions = [
-  { label: "Newest", sortDirection: "desc", sortField: "createdAt" },
+  { label: "Newest", sortDirection: "desc", sortField: "publishedAt" },
   { label: "Title A-Z", sortDirection: "asc", sortField: "title" },
   { label: "Price low to high", sortDirection: "asc", sortField: "price" },
   { label: "Price high to low", sortDirection: "desc", sortField: "price" },
@@ -171,7 +171,7 @@ export function CourseFilters({ categoryGroups, query }: CourseFiltersProps) {
             defaultValue={
               query.sortField && query.sortDirection
                 ? `${query.sortField}:${query.sortDirection}`
-                : "createdAt:desc"
+                : "publishedAt:desc"
             }
             id="sort"
             name="sort"

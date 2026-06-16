@@ -5,7 +5,10 @@ type ApiRequestOptions = Omit<RequestInit, "body" | "headers"> & {
   accessToken?: string | null;
   body?: unknown;
   headers?: HeadersInit;
+  timeoutMs?: number;
 };
+
+const DEFAULT_REQUEST_TIMEOUT_MS = 10000;
 
 export class ApiError extends Error {
   details?: unknown;
@@ -51,9 +54,21 @@ export async function apiRequest<T>(
     accessToken,
     body,
     headers: requestHeaders,
+    signal: requestSignal,
+    timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
     ...fetchOptions
   } = options;
   const headers = new Headers(requestHeaders);
+  const controller = new AbortController();
+  let didTimeout = false;
+  const timeoutId =
+    timeoutMs > 0
+      ? setTimeout(() => {
+          didTimeout = true;
+          controller.abort();
+        }, timeoutMs)
+      : null;
+  const abortRequest = () => controller.abort();
 
   if (body !== undefined && !(body instanceof FormData)) {
     headers.set("Content-Type", "application/json");
@@ -63,17 +78,46 @@ export async function apiRequest<T>(
     headers.set("Authorization", `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(resolveUrl(path), {
-    ...fetchOptions,
-    body:
-      body === undefined
-        ? undefined
-        : body instanceof FormData
-          ? body
-          : JSON.stringify(body),
-    credentials: "include",
-    headers,
-  });
+  if (requestSignal?.aborted) {
+    controller.abort();
+  } else {
+    requestSignal?.addEventListener("abort", abortRequest, { once: true });
+  }
+
+  let response: Response;
+
+  try {
+    response = await fetch(resolveUrl(path), {
+      ...fetchOptions,
+      body:
+        body === undefined
+          ? undefined
+          : body instanceof FormData
+            ? body
+            : JSON.stringify(body),
+      credentials: "include",
+      headers,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (isAbortError(error)) {
+      throw new ApiError({
+        details: null,
+        message: didTimeout
+          ? "Request timed out. Please try again."
+          : "Request was cancelled.",
+        statusCode: 408,
+      });
+    }
+
+    throw error;
+  } finally {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    requestSignal?.removeEventListener("abort", abortRequest);
+  }
 
   const payload = (await response.json().catch(() => null)) as
     | ApiResponse<T>
@@ -108,4 +152,8 @@ export async function apiRequest<T>(
   }
 
   return payload as T;
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError";
 }

@@ -45,6 +45,7 @@ export function resetPassword(input: ResetPasswordInput) {
 export function refreshSession() {
   return apiRequest<AuthResponseData>("/auth/refresh", {
     method: "POST",
+    timeoutMs: 5000,
   });
 }
 

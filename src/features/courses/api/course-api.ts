@@ -13,6 +13,7 @@ export function getPublicCourses(query?: PublicCourseQuery) {
     `/courses/public${buildPublicCourseQueryString(query)}`,
     {
       method: "GET",
+      timeoutMs: 10000,
     },
   );
 }
@@ -29,5 +30,6 @@ export function getPublicCourseBySlug(slug: string) {
 export function getPublicCategoryTree() {
   return apiRequest<CategoryTreeNode[]>("/courses/public/category-tree", {
     method: "GET",
+    timeoutMs: 10000,
   });
 }
