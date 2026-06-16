@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { PublicNavbar } from "@/components/layout/public-navbar/public-navbar";
-import { getPublicCategoryTree, getPublicCourses } from "@/features/courses/api/course-api";
+import {
+  getPublicCategoryTree,
+  getPublicCourses,
+} from "@/features/courses/api/course-api";
 import { CourseCatalogState } from "@/features/courses/components/course-catalog-state";
 import { CourseFilterSummary } from "@/features/courses/components/course-filter-summary";
 import { CourseFilters } from "@/features/courses/components/course-filters";
@@ -10,9 +13,13 @@ import { CourseGrid } from "@/features/courses/components/course-grid";
 import { CoursePagination } from "@/features/courses/components/course-pagination";
 import { CourseSearch } from "@/features/courses/components/course-search";
 import { CoursesHeader } from "@/features/courses/components/courses-header";
-import type { CategoryTreeNode, PaginatedCourses } from "@/features/courses/types/course";
+import type {
+  CategoryTreeNode,
+  PaginatedCourses,
+} from "@/features/courses/types/course";
 import {
-  flattenCategoryTree,
+  buildSelectableCategoryGroups,
+  flattenCategoryGroups,
   parsePublicCourseQuery,
 } from "@/features/courses/utils/course-data";
 
@@ -33,7 +40,8 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   const resolvedSearchParams = await searchParams;
   const query = parsePublicCourseQuery(resolvedSearchParams);
   const { categories, courses, error } = await getCatalogData(query);
-  const categoryOptions = flattenCategoryTree(categories);
+  const categoryGroups = buildSelectableCategoryGroups(categories);
+  const categoryOptions = flattenCategoryGroups(categoryGroups);
 
   return (
     <main className="min-h-screen bg-muted text-foreground">
@@ -43,7 +51,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
       <section className="mx-auto grid w-full max-w-[1440px] gap-5 px-5 pb-16 sm:px-8 lg:grid-cols-[280px_1fr] lg:px-12 lg:pb-24">
         <aside className="lg:sticky lg:top-16 lg:self-start">
           <Suspense fallback={null}>
-            <CourseFilters categories={categoryOptions} query={query} />
+            <CourseFilters categoryGroups={categoryGroups} query={query} />
           </Suspense>
         </aside>
 
@@ -64,7 +72,9 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
           ) : (
             <>
               <CourseGrid courses={courses?.data ?? []} />
-              {courses ? <CoursePagination meta={courses.meta} query={query} /> : null}
+              {courses ? (
+                <CoursePagination meta={courses.meta} query={query} />
+              ) : null}
             </>
           )}
         </div>
@@ -73,7 +83,9 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   );
 }
 
-async function getCatalogData(query: ReturnType<typeof parsePublicCourseQuery>) {
+async function getCatalogData(
+  query: ReturnType<typeof parsePublicCourseQuery>,
+) {
   try {
     const [courses, categories] = await Promise.all([
       getPublicCourses(query),

@@ -17,6 +17,7 @@ import type {
   RegisterInput,
   UserRole,
 } from "@/features/auth/types/auth";
+import type { UserProfile } from "@/features/users/types/profile";
 
 export type AuthStatus = "authenticated" | "guest" | "loading";
 
@@ -28,6 +29,7 @@ export type AuthContextValue = {
   refresh: () => Promise<boolean>;
   register: (input: RegisterInput) => Promise<void>;
   status: AuthStatus;
+  updateUser: (nextUser: AuthUser | CurrentUser | UserProfile) => void;
   user: CurrentUser | AuthUser | null;
 };
 
@@ -36,6 +38,8 @@ export const AuthContext = createContext<AuthContextValue | null>(null);
 type AuthProviderProps = {
   children: ReactNode;
 };
+
+const sessionCheckTimeoutMs = 5000;
 
 function getMessage(error: unknown) {
   return error instanceof Error ? error.message : "Authentication failed.";
@@ -50,6 +54,24 @@ function normalizeUser(user: AuthUser | CurrentUser) {
     ...user,
     role: isAllowedRole(user.role) ? user.role : "LEARNER",
   };
+}
+
+function withSessionTimeout<T>(promise: Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      reject(new Error("Session check timed out."));
+    }, sessionCheckTimeoutMs);
+
+    promise
+      .then((value) => {
+        window.clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((error: unknown) => {
+        window.clearTimeout(timeoutId);
+        reject(error);
+      });
+  });
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -73,9 +95,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     [],
   );
 
+  const updateUser = useCallback(
+    (nextUser: AuthUser | CurrentUser | UserProfile) => {
+      setUser(normalizeUser(nextUser));
+    },
+    [],
+  );
+
   const refresh = useCallback(async () => {
     try {
-      const result = await authApi.refreshSession();
+      const result = await withSessionTimeout(authApi.refreshSession());
       await setAuthenticatedSession(result.accessToken, result.user);
       setError(null);
       return true;
@@ -90,8 +119,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     let isMounted = true;
 
-    authApi
-      .refreshSession()
+    withSessionTimeout(authApi.refreshSession())
       .then(async (result) => {
         if (!isMounted) {
           return;
@@ -166,9 +194,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       refresh,
       register,
       status,
+      updateUser,
       user,
     }),
-    [accessToken, error, login, logout, refresh, register, status, user],
+    [
+      accessToken,
+      error,
+      login,
+      logout,
+      refresh,
+      register,
+      status,
+      updateUser,
+      user,
+    ],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

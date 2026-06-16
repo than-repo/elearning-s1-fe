@@ -7,10 +7,16 @@ import { RoleProtectedRoute } from "@/features/auth/components/role-protected-ro
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { CourseImage } from "@/features/courses/components/course-image";
 import type { PublicCourse } from "@/features/courses/types/course";
-import { formatCourseDuration } from "@/features/courses/utils/course-data";
+import {
+  formatCourseDuration,
+  formatCoursePrice,
+} from "@/features/courses/utils/course-data";
 import { ApiError } from "@/lib/api/client";
 
-import { enrollInCourse, getCourseEnrollmentStatus } from "../api/enrollment-api";
+import {
+  enrollInCourse,
+  getCourseEnrollmentStatus,
+} from "../api/enrollment-api";
 
 type PaymentCheckoutProps = {
   course: PublicCourse;
@@ -121,7 +127,9 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
           <div className="mt-4 rounded-md border border-primary bg-primary/5 p-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="font-semibold">{isFree ? "Free enrollment" : "VN_PAY"}</p>
+                <p className="font-semibold">
+                  {isFree ? "Free enrollment" : "VN_PAY"}
+                </p>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
                   {isFree
                     ? "No payment is required for this course."
@@ -157,7 +165,9 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
 
       <aside className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-16">
         <CourseImage course={course} />
-        <h2 className="mt-4 text-xl font-semibold leading-tight">{course.title}</h2>
+        <h2 className="mt-4 text-xl font-semibold leading-tight">
+          {course.title}
+        </h2>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
           {course.shortDescription}
         </p>
@@ -175,7 +185,7 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
             Total
           </span>
           <span className="text-3xl font-semibold">
-            {isFree ? "Free" : formatVndPrice(course.price)}
+            {formatCoursePrice(course.price)}
           </span>
         </div>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
@@ -184,14 +194,6 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
       </aside>
     </section>
   );
-}
-
-function formatVndPrice(price?: number | null) {
-  return new Intl.NumberFormat("vi-VN", {
-    currency: "VND",
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(price ?? 0);
 }
 
 function PaymentRow({ label, value }: { label: string; value: string }) {

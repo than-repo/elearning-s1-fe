@@ -4,13 +4,15 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { FormEvent } from "react";
 
 import type { PublicCourseQuery } from "../types/course";
-import type { CourseCategoryOption } from "../utils/course-data";
+import type { CourseCategoryGroup } from "../utils/course-data";
 import { formatCourseLevel } from "../utils/course-data";
 
 type CourseFiltersProps = {
-  categories: CourseCategoryOption[];
+  categoryGroups: CourseCategoryGroup[];
   query: PublicCourseQuery;
 };
+
+export const COURSE_CATALOG_CONTROLS_FORM_ID = "course-catalog-controls";
 
 const inputClasses =
   "mt-2 min-h-11 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary-focus/20";
@@ -24,7 +26,7 @@ const sortOptions = [
   { label: "Price high to low", sortDirection: "desc", sortField: "price" },
 ] as const;
 
-export function CourseFilters({ categories, query }: CourseFiltersProps) {
+export function CourseFilters({ categoryGroups, query }: CourseFiltersProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -37,6 +39,7 @@ export function CourseFilters({ categories, query }: CourseFiltersProps) {
     const sortValue = String(formData.get("sort") ?? "");
     const [sortField, sortDirection] = sortValue.split(":");
 
+    setParam(params, "search", formData.get("search"));
     setParam(params, "categoryId", formData.get("categoryId"));
     setParam(params, "level", formData.get("level"));
     setParam(params, "minPrice", formData.get("minPrice"));
@@ -53,12 +56,16 @@ export function CourseFilters({ categories, query }: CourseFiltersProps) {
   return (
     <form
       className="rounded-lg border border-border bg-card p-4"
+      id={COURSE_CATALOG_CONTROLS_FORM_ID}
       onSubmit={handleSubmit}
     >
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Filters</h2>
-        <button className="text-sm text-primary" type="submit">
-          Apply
+        <button
+          className="inline-flex min-h-9 items-center justify-center rounded-pill border border-primary bg-primary px-4 text-sm font-normal text-primary-foreground transition-transform active:scale-95"
+          type="submit"
+        >
+          Apply filters
         </button>
       </div>
 
@@ -72,10 +79,14 @@ export function CourseFilters({ categories, query }: CourseFiltersProps) {
             name="categoryId"
           >
             <option value="">All categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {"--".repeat(category.depth)} {category.name}
-              </option>
+            {categoryGroups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {"--".repeat(category.depth)} {category.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>

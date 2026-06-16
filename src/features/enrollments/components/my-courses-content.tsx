@@ -12,8 +12,7 @@ import type { PaginatedEnrollments } from "../types/enrollment";
 import { MyCourseCard } from "./my-course-card";
 import { MyCoursesPagination } from "./my-courses-pagination";
 
-const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 50;
+const MY_COURSES_PAGE_SIZE = 9;
 
 export function MyCoursesContent() {
   const pathname = usePathname();
@@ -70,7 +69,7 @@ export function MyCoursesContent() {
   if (isLoading) {
     return (
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 3 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <div
             className="min-h-[320px] rounded-lg border border-border bg-card p-4"
             key={index}
@@ -115,19 +114,19 @@ export function MyCoursesContent() {
 
   return (
     <div className="grid gap-5">
-      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {result.data.map((enrollment) => (
           <MyCourseCard enrollment={enrollment} key={enrollment.id} />
         ))}
       </div>
-      <MyCoursesPagination meta={result.meta} query={query} />
+      <MyCoursesPagination meta={result.meta} />
     </div>
   );
 }
 
 function parseMyCoursesQuery(searchParams: URLSearchParams) {
   return {
-    limit: clampNumber(searchParams.get("limit"), DEFAULT_LIMIT, 1, MAX_LIMIT),
+    limit: MY_COURSES_PAGE_SIZE,
     page: clampNumber(searchParams.get("page"), 1, 1),
   };
 }

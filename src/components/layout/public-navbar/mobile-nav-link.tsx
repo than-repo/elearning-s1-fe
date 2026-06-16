@@ -9,7 +9,7 @@ export function MobileNavLink({ href, label }: MobileNavLinkProps) {
   return (
     <Link
       href={href}
-      className="hidden rounded-pill border border-white/25 px-3 py-1.5 text-xs font-normal text-white transition-colors hover:border-white sm:inline-flex md:hidden"
+      className="inline-flex min-h-8 shrink-0 items-center rounded-pill border border-border bg-card px-3 text-xs font-semibold text-ink-muted transition-colors hover:border-primary hover:text-primary md:hidden"
     >
       {label}
     </Link>

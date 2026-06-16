@@ -64,9 +64,9 @@ export function MyCourseCard({ enrollment }: MyCourseCardProps) {
 
         <Link
           className="mt-5 inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95"
-          href={`/courses/${course.slug}`}
+          href={`/courses/${course.slug}/learn`}
         >
-          View course
+          Continue learning
         </Link>
       </div>
     </article>

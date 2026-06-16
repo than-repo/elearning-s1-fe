@@ -1,62 +1,72 @@
-import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button-link";
 import { SectionHeader } from "@/components/ui/section-header";
-
-import type { FeaturedCourse } from "../home-content";
+import { CourseCard } from "@/features/courses/components/course-card";
+import type { PublicCourse } from "@/features/courses/types/course";
 
 type FeaturedCoursesSectionProps = {
-  courses: FeaturedCourse[];
+  courses: PublicCourse[];
+  isUnavailable: boolean;
 };
 
 export function FeaturedCoursesSection({
   courses,
+  isUnavailable,
 }: FeaturedCoursesSectionProps) {
   return (
-    <section className="bg-surface-dark text-white">
+    <section className="bg-muted">
       <div className="mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
         <SectionHeader
           action={
-            <ButtonLink href="/courses" size="sm" variant="ghostOnDark">
+            <ButtonLink href="/courses" size="sm" variant="ghost">
               View all courses
             </ButtonLink>
           }
           className="mb-10"
-          description="Static previews for now, ready to connect to the course catalog later."
+          description="Freshly published courses from the live catalog, ready for learners to compare and continue into details."
           eyebrow="Featured courses"
-          title="Practical paths, presented with less noise."
-          tone="dark"
+          title="Explore courses learners can start now."
         />
 
-        <div className="grid gap-5 md:grid-cols-3">
-          {courses.map((course) => (
-            <article
-              key={course.title}
-              className="flex min-h-72 flex-col rounded-lg border border-white/10 bg-white/5 p-6"
-            >
-              <div className="mb-8 flex items-center justify-between gap-3">
-                <Badge variant="dark">{course.level}</Badge>
-                <span className="text-sm font-normal text-white/60">
-                  {course.duration}
-                </span>
-              </div>
-              <h3 className="text-2xl font-semibold leading-tight text-white">
-                {course.title}
-              </h3>
-              <p className="mt-4 flex-1 text-base leading-7 text-white/70">
-                {course.description}
-              </p>
-              <ButtonLink
-                className="mt-7 justify-start px-0"
-                href="/courses"
-                size="sm"
-                variant="ghostOnDark"
-              >
-                Explore course
-              </ButtonLink>
-            </article>
-          ))}
-        </div>
+        {isUnavailable ? (
+          <FeaturedCoursesState
+            description="The catalog could not be loaded. You can still open the courses page and try again."
+            title="Featured courses are unavailable"
+          />
+        ) : courses.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {courses.map((course) => (
+              <CourseCard course={course} key={course.id} />
+            ))}
+          </div>
+        ) : (
+          <FeaturedCoursesState
+            description="No published courses were returned for the homepage yet."
+            title="No featured courses yet"
+          />
+        )}
       </div>
     </section>
+  );
+}
+
+type FeaturedCoursesStateProps = {
+  description: string;
+  title: string;
+};
+
+function FeaturedCoursesState({
+  description,
+  title,
+}: FeaturedCoursesStateProps) {
+  return (
+    <div className="rounded-lg border border-border bg-card px-5 py-14 text-center">
+      <p className="text-lg font-semibold">{title}</p>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+        {description}
+      </p>
+      <ButtonLink className="mt-5" href="/courses" size="sm">
+        Browse all courses
+      </ButtonLink>
+    </div>
   );
 }

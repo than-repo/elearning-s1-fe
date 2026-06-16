@@ -13,7 +13,7 @@ export function NavLink({ link }: NavLinkProps) {
   return (
     <Link
       href={link.href}
-      className="text-xs font-normal leading-none text-white/70 transition-colors hover:text-white"
+      className="inline-flex min-h-9 items-center rounded-pill px-3 text-sm font-semibold text-ink-muted transition-colors hover:bg-muted hover:text-foreground"
     >
       {link.label}
     </Link>

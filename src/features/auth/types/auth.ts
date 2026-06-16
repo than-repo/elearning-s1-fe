@@ -15,7 +15,7 @@ export type CurrentUser = AuthUser & {
   gender?: "MALE" | "FEMALE" | "OTHER" | "PREFER_NOT_TO_SAY" | null;
   isActive?: boolean;
   lastLoginAt?: string | null;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   updatedAt?: string;
 };
 

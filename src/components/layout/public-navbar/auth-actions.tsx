@@ -1,38 +1,34 @@
-import { ButtonLink } from "@/components/ui/button-link";
+import Link from "next/link";
 
 import { UserMenu, type PublicNavbarUser } from "./user-menu";
 
 type AuthActionsProps = {
   currentUser?: PublicNavbarUser | null;
-  isLoading?: boolean;
   onLogout?: () => Promise<void> | void;
 };
 
 export function AuthActions({
   currentUser = null,
-  isLoading = false,
   onLogout,
 }: AuthActionsProps) {
-  if (isLoading) {
-    return (
-      <div className="hidden min-h-8 items-center rounded-pill border border-white/10 px-4 text-xs text-white/60 sm:flex">
-        Account
-      </div>
-    );
-  }
-
   if (currentUser) {
     return <UserMenu onLogout={onLogout} user={currentUser} />;
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <ButtonLink href="/login" size="sm" variant="ghostOnDark">
+    <div className="flex shrink-0 items-center gap-2">
+      <Link
+        className="inline-flex min-h-9 items-center justify-center rounded-pill px-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted sm:px-4"
+        href="/login"
+      >
         Login
-      </ButtonLink>
-      <ButtonLink className="min-h-8 px-4 text-sm" href="/register" size="sm">
+      </Link>
+      <Link
+        className="inline-flex min-h-9 items-center justify-center rounded-pill border border-foreground bg-foreground px-3 text-sm font-semibold text-background transition-transform active:scale-95 sm:px-4"
+        href="/register"
+      >
         Register
-      </ButtonLink>
+      </Link>
     </div>
   );
 }

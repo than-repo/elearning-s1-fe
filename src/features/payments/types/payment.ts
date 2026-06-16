@@ -1,0 +1,46 @@
+export type VnpayLocale = "vn" | "en";
+
+export type CreateVnpayPaymentUrlInput = {
+  bankCode?: string;
+  courseId: string;
+  locale?: VnpayLocale;
+};
+
+export type CreateVnpayPaymentUrlResult = {
+  amount: number;
+  paymentId: string;
+  paymentUrl: string;
+  txnRef: string | null;
+};
+
+export type PaymentMethod = "VNPAY";
+
+export type PaymentStatus =
+  | "PENDING"
+  | "PAID"
+  | "FAILED"
+  | "CANCELLED"
+  | "EXPIRED";
+
+export type PaymentResponse = {
+  amount: number;
+  createdAt: string;
+  courseId: string;
+  currency: string;
+  id: string;
+  paidAt: string | null;
+  paymentMethod: PaymentMethod;
+  provider: string;
+  providerPaymentId: string | null;
+  status: PaymentStatus;
+  txnRef: string | null;
+  updatedAt: string;
+  userId: string;
+};
+
+export type VnpayReturnStatus = "success" | "failed" | "already_paid";
+
+export type VnpayReturnResult = {
+  payment: PaymentResponse;
+  status: VnpayReturnStatus;
+};

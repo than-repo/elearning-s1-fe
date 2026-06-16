@@ -17,15 +17,19 @@ export type HomeStat = {
   value: string;
 };
 
-export type FeaturedCourse = {
+export type HomeValueCard = {
   description: string;
-  duration: string;
-  level: string;
+  eyebrow: string;
   title: string;
 };
 
-export type RoleCard = {
-  description: string;
+export type HomeFooterLink = {
+  href: string;
+  label: string;
+};
+
+export type HomeFooterGroup = {
+  links: HomeFooterLink[];
   title: string;
 };
 
@@ -36,14 +40,15 @@ export const navLinks: PublicNavLink[] = [
 ];
 
 export const heroContent = {
-  eyebrow: "Online learning, pared back",
-  title: "One calm place to learn, teach, and manage courses.",
+  eyebrow: "Ucademy-style learning marketplace",
+  title: "Learn the skills that move your career forward.",
   description:
-    "A focused MVP experience for learners, instructors, and admins, designed around clear courses, steady progress, and simple controls.",
-  primaryAction: { href: "/courses", label: "Browse courses" },
-  secondaryAction: { href: "/login", label: "Sign in" },
+    "Explore practical courses, find focused learning paths, and start building real project skills from one clear catalog.",
+  primaryAction: { href: "/courses", label: "Explore courses" },
+  secondaryAction: { href: "/register", label: "Create account" },
+  searchPlaceholder: "What do you want to learn?",
   image: {
-    alt: "Premium learning workspace shown on a laptop and tablet",
+    alt: "Learning platform dashboard shown on a laptop and tablet",
     height: 1024,
     src: "/images/home-learning-workspace.png",
     width: 1536,
@@ -51,64 +56,109 @@ export const heroContent = {
 };
 
 export const benefits = [
-  "Structured courses",
-  "Progress-ready",
-  "Instructor tools",
-  "Admin review",
+  "Fresh course catalog",
+  "Beginner to advanced",
+  "Project-focused paths",
+  "Certificate-ready learning",
 ];
 
 export const stats: HomeStat[] = [
-  { label: "Course paths for the catalog", value: "120+" },
-  { label: "Learner activity prepared", value: "8k+" },
-  { label: "Roles shaped for MVP workflows", value: "3" },
+  { label: "Learning categories", value: "20+" },
+  { label: "Practical course paths", value: "120+" },
+  { label: "Platform roles supported", value: "3" },
 ];
 
-export const featuredCourses: FeaturedCourse[] = [
+export const learnerOutcomes: HomeValueCard[] = [
   {
-    title: "Foundations of Web Development",
-    level: "Beginner",
-    duration: "6 weeks",
+    eyebrow: "For learners",
+    title: "Find the right next lesson faster",
     description:
-      "A clean path through HTML, CSS, and JavaScript for new learners.",
+      "Search by topic, compare course details, and continue into structured lessons without extra navigation noise.",
   },
   {
-    title: "Backend APIs with NestJS",
-    level: "Intermediate",
-    duration: "8 weeks",
+    eyebrow: "For instructors",
+    title: "Package skills into focused courses",
     description:
-      "TypeScript API design with validation, service boundaries, and secure routes.",
+      "Organize sections, lessons, files, and course information around a clear publishing workflow.",
   },
   {
-    title: "Productive Learning Habits",
-    level: "All levels",
-    duration: "3 weeks",
+    eyebrow: "For teams",
+    title: "Keep review and enrollment controlled",
     description:
-      "A simple system for study rhythm, progress, and deliberate practice.",
+      "Support admins, reviewers, learners, and instructors with role-aware platform surfaces.",
   },
 ];
 
-export const roleCards: RoleCard[] = [
+export const trustCards: HomeValueCard[] = [
   {
-    title: "Learners",
+    eyebrow: "Catalog",
+    title: "Real published courses",
     description:
-      "Find courses, follow lessons, and keep learning progress easy to read.",
+      "The homepage uses the same public course data as the catalog, so featured learning stays connected to the platform.",
   },
   {
-    title: "Instructors",
+    eyebrow: "Discovery",
+    title: "Search-first browsing",
     description:
-      "Prepare course content, organize sections, and keep teaching workflows focused.",
+      "A focused search bar and category links send learners directly into filtered course results.",
   },
   {
-    title: "Admins and reviewers",
+    eyebrow: "Growth",
+    title: "Ready for richer learning flows",
     description:
-      "Review courses, manage categories, and keep platform operations controlled.",
+      "The layout leaves room for reviews, ratings, progress, and recommendations as those features mature.",
   },
 ];
 
 export const finalCta = {
-  title: "Start with the catalog. Grow into the full platform.",
+  title: "Start learning from the course catalog today.",
   description:
-    "The HomePage stays static for now, but it sets the visual foundation for the course, auth, and dashboard flows that come next.",
-  primaryAction: { href: "/register", label: "Register now" },
+    "Create an account to prepare for enrollment flows, or browse published courses before you sign in.",
+  primaryAction: { href: "/register", label: "Create account" },
   secondaryAction: { href: "/courses", label: "Browse courses" },
+};
+
+export const footerContent = {
+  brand: brandLabel,
+  demoNote: "Demo for learning",
+  notice: "Demo learning platform for course marketplace practice.",
+  groups: [
+    {
+      title: "Explore",
+      links: [
+        { href: "/courses", label: "Courses" },
+        { href: "/my-courses", label: "My Courses" },
+        { href: "/register", label: "Register" },
+      ],
+    },
+    {
+      title: "Account",
+      links: [
+        { href: "/login", label: "Login" },
+        { href: "/profile", label: "Edit profile" },
+        { href: "/forgot-password", label: "Forgot password" },
+      ],
+    },
+    {
+      title: "Learning demo",
+      links: [
+        { href: "#", label: "Categories" },
+        { href: "#", label: "Instructors" },
+        { href: "#", label: "Certificates" },
+      ],
+    },
+    {
+      title: "Support",
+      links: [
+        { href: "#", label: "Help center" },
+        { href: "#", label: "Terms" },
+        { href: "#", label: "Privacy" },
+      ],
+    },
+  ],
+} satisfies {
+  brand: string;
+  demoNote: string;
+  groups: HomeFooterGroup[];
+  notice: string;
 };

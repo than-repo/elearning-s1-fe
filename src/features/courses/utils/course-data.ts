@@ -32,6 +32,11 @@ export type CourseCategoryOption = {
   name: string;
 };
 
+export type CourseCategoryGroup = {
+  label: string;
+  options: CourseCategoryOption[];
+};
+
 export function buildPublicCourseQueryString(query?: PublicCourseQuery) {
   if (!query) {
     return "";
@@ -108,6 +113,43 @@ export function flattenCategoryTree(
   ]);
 }
 
+export function buildSelectableCategoryGroups(
+  categories: CategoryTreeNode[],
+): CourseCategoryGroup[] {
+  return categories
+    .map((category) => {
+      if (category.children.length === 0) {
+        return {
+          label: category.name,
+          options: [toCategoryOption(category, 0)],
+        };
+      }
+
+      return {
+        label: category.name,
+        options: flattenCategoryTree(category.children, 0),
+      };
+    })
+    .filter((group) => group.options.length > 0);
+}
+
+export function flattenCategoryGroups(
+  groups: CourseCategoryGroup[],
+): CourseCategoryOption[] {
+  return groups.flatMap((group) => group.options);
+}
+
+function toCategoryOption(
+  category: CategoryTreeNode,
+  depth: number,
+): CourseCategoryOption {
+  return {
+    depth,
+    id: category.id,
+    name: category.name,
+  };
+}
+
 export function getCourseImageSource(course: PublicCourse) {
   if (course.thumbnailUrl) {
     return course.thumbnailUrl;
@@ -160,11 +202,11 @@ export function formatCourseLevel(level: CourseLevel) {
 
 export function formatCourseDuration(durationInMinutes?: number | null) {
   if (durationInMinutes === undefined || durationInMinutes === null) {
-    return "Duration unavailable";
+    return "Self-paced";
   }
 
   if (durationInMinutes <= 0) {
-    return "Duration unavailable";
+    return "Self-paced";
   }
 
   if (durationInMinutes < 60) {
@@ -186,11 +228,9 @@ export function formatCoursePrice(price?: number | null) {
     return "Free";
   }
 
-  return new Intl.NumberFormat("en-US", {
-    currency: "USD",
-    maximumFractionDigits: 2,
-    style: "currency",
-  }).format(price);
+  return `${new Intl.NumberFormat("vi-VN", {
+    maximumFractionDigits: 0,
+  }).format(price)} VNĐ`;
 }
 
 function getFirstValue(value: string | string[] | undefined) {

@@ -1,14 +1,12 @@
 import Link from "next/link";
 
 import type { PaginationMeta } from "@/features/courses/types/course";
-import type { MyEnrollmentsQuery } from "../types/enrollment";
 
 type MyCoursesPaginationProps = {
   meta: PaginationMeta;
-  query: MyEnrollmentsQuery;
 };
 
-export function MyCoursesPagination({ meta, query }: MyCoursesPaginationProps) {
+export function MyCoursesPagination({ meta }: MyCoursesPaginationProps) {
   if (meta.totalPages <= 1) {
     return null;
   }
@@ -26,7 +24,7 @@ export function MyCoursesPagination({ meta, query }: MyCoursesPaginationProps) {
       <div className="flex flex-wrap items-center justify-center gap-2">
         <PaginationLink
           disabled={!meta.hasPreviousPage}
-          href={buildMyCoursesHref({ ...query, page: meta.page - 1 })}
+          href={buildMyCoursesHref(meta.page - 1)}
           label="Previous"
         />
         <div className="hidden items-center gap-2 sm:flex">
@@ -39,7 +37,7 @@ export function MyCoursesPagination({ meta, query }: MyCoursesPaginationProps) {
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border text-foreground hover:border-primary hover:text-primary",
               ].join(" ")}
-              href={buildMyCoursesHref({ ...query, page })}
+              href={buildMyCoursesHref(page)}
               key={page}
             >
               {page}
@@ -48,7 +46,7 @@ export function MyCoursesPagination({ meta, query }: MyCoursesPaginationProps) {
         </div>
         <PaginationLink
           disabled={!meta.hasNextPage}
-          href={buildMyCoursesHref({ ...query, page: meta.page + 1 })}
+          href={buildMyCoursesHref(meta.page + 1)}
           label="Next"
         />
       </div>
@@ -83,15 +81,11 @@ function PaginationLink({
   );
 }
 
-function buildMyCoursesHref(query: MyEnrollmentsQuery) {
+function buildMyCoursesHref(page: number) {
   const params = new URLSearchParams();
 
-  if (query.page !== undefined && query.page !== null) {
-    params.set("page", String(query.page));
-  }
-
-  if (query.limit !== undefined && query.limit !== null) {
-    params.set("limit", String(query.limit));
+  if (page > 1) {
+    params.set("page", String(page));
   }
 
   const queryString = params.toString();

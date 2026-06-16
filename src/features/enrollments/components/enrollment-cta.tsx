@@ -102,7 +102,10 @@ export function EnrollmentCta({ course }: EnrollmentCtaProps) {
         eyebrow="Enrolled"
         message="You are enrolled in this course."
       >
-        <Link className={secondaryButtonClasses} href={`/courses/${course.slug}`}>
+        <Link
+          className={secondaryButtonClasses}
+          href={`/courses/${course.slug}/learn`}
+        >
           Continue learning
         </Link>
       </CtaShell>
