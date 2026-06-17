@@ -2,20 +2,14 @@ import type { CourseLevel, PaginationMeta } from "@/features/courses/types/cours
 
 export type EnrollmentStatus = "ACTIVE" | "COMPLETED" | "CANCELLED" | "EXPIRED";
 
-export type PaymentMethod =
-  | "CREDIT_CARD"
-  | "BANK_TRANSFER"
-  | "E_WALLET"
-  | "PAYPAL"
-  | "VN_PAY"
-  | "FREE";
+export type PaymentMethod = "VNPAY" | "SIMULATION";
 
 export type PaymentStatus =
   | "PENDING"
-  | "COMPLETED"
+  | "PAID"
   | "FAILED"
-  | "REFUNDED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "EXPIRED";
 
 export type EnrollmentCourseSummary = {
   id: string;

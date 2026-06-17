@@ -13,7 +13,11 @@ export type CreateVnpayPaymentUrlResult = {
   txnRef: string | null;
 };
 
-export type PaymentMethod = "VNPAY";
+export type CreateSimulationPaymentInput = {
+  courseId: string;
+};
+
+export type PaymentMethod = "VNPAY" | "SIMULATION";
 
 export type PaymentStatus =
   | "PENDING"
@@ -43,4 +47,15 @@ export type VnpayReturnStatus = "success" | "failed" | "already_paid";
 export type VnpayReturnResult = {
   payment: PaymentResponse;
   status: VnpayReturnStatus;
+};
+
+export type SimulationPaymentStatus =
+  | "pending"
+  | "success"
+  | "failed"
+  | "already_paid";
+
+export type SimulationPaymentResult = {
+  payment: PaymentResponse;
+  status: SimulationPaymentStatus;
 };
