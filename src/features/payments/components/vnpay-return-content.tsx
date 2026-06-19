@@ -81,6 +81,9 @@ export function VnpayReturnContent() {
     pendingPayment,
     verifiedResult,
   );
+  const pendingCourseHref = pendingPayment
+    ? `/courses/${pendingPayment.courseSlug}`
+    : "/courses";
 
   useEffect(() => {
     if (!isPaidResult || !matchedPendingPayment) {
@@ -143,6 +146,12 @@ export function VnpayReturnContent() {
     };
   }, [accessToken, authStatus, isPaidResult, matchedPendingPayment]);
 
+  useEffect(() => {
+    if (verifiedResult?.status === "failed" && matchedPendingPayment) {
+      clearPendingVnpayPayment();
+    }
+  }, [matchedPendingPayment, verifiedResult?.status]);
+
   if (!queryString) {
     return (
       <ReturnShell
@@ -153,7 +162,9 @@ export function VnpayReturnContent() {
           VNPay did not return payment information.
         </p>
         <ReturnActions>
-          <ActionLink href="/courses">Back to courses</ActionLink>
+          <ActionLink href={pendingCourseHref}>
+            {pendingPayment ? "Back to course" : "Back to courses"}
+          </ActionLink>
         </ReturnActions>
       </ReturnShell>
     );
@@ -179,7 +190,9 @@ export function VnpayReturnContent() {
           <ActionLink href="/payments/vnpay/return" variant="secondary">
             Retry
           </ActionLink>
-          <ActionLink href="/courses">Back to courses</ActionLink>
+          <ActionLink href={pendingCourseHref}>
+            {pendingPayment ? "Back to course" : "Back to courses"}
+          </ActionLink>
         </ReturnActions>
       </ReturnShell>
     );
@@ -205,8 +218,15 @@ export function VnpayReturnContent() {
           >
             Try again
           </ActionLink>
-          <ActionLink href="/courses" variant="secondary">
-            Back to courses
+          <ActionLink
+            href={
+              matchedPendingPayment
+                ? `/courses/${matchedPendingPayment.courseSlug}`
+                : "/courses"
+            }
+            variant="secondary"
+          >
+            {matchedPendingPayment ? "Back to course" : "Back to courses"}
           </ActionLink>
         </ReturnActions>
       </ReturnShell>

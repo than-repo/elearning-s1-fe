@@ -4,6 +4,7 @@ export type PendingVnpayPayment = {
   courseId: string;
   courseSlug: string;
   courseTitle: string;
+  paymentUrl?: string;
   txnRef: string | null;
 };
 
@@ -36,6 +37,8 @@ export function getPendingVnpayPayment(): PendingVnpayPayment | null {
       typeof parsed.courseId !== "string" ||
       typeof parsed.courseSlug !== "string" ||
       typeof parsed.courseTitle !== "string" ||
+      (parsed.paymentUrl !== undefined &&
+        typeof parsed.paymentUrl !== "string") ||
       (parsed.txnRef !== null && typeof parsed.txnRef !== "string")
     ) {
       return null;
@@ -45,6 +48,7 @@ export function getPendingVnpayPayment(): PendingVnpayPayment | null {
       courseId: parsed.courseId,
       courseSlug: parsed.courseSlug,
       courseTitle: parsed.courseTitle,
+      paymentUrl: parsed.paymentUrl,
       txnRef: parsed.txnRef ?? null,
     };
   } catch {

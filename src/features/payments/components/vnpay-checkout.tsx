@@ -24,7 +24,12 @@ import {
   failSimulationPayment,
 } from "../api/payment-api";
 import type { SimulationPaymentResult } from "../types/payment";
-import { savePendingVnpayPayment } from "../utils/pending-vnpay-payment";
+import {
+  clearPendingVnpayPayment,
+  getPendingVnpayPayment,
+  savePendingVnpayPayment,
+  type PendingVnpayPayment,
+} from "../utils/pending-vnpay-payment";
 
 type VnpayCheckoutProps = {
   course: PublicCourse;
@@ -52,6 +57,8 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
   const router = useRouter();
   const { accessToken } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [pendingVnpayPayment, setPendingVnpayPayment] =
+    useState<PendingVnpayPayment | null>(null);
   const [method, setMethod] = useState<CheckoutMethod>("simulation");
   const [busyAction, setBusyAction] = useState<BusyAction>("checking");
   const [simulationPayment, setSimulationPayment] =
@@ -70,8 +77,26 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
   );
 
   useEffect(() => {
+    const restorePendingVnpayPayment = () => {
+      const pendingPayment = getMatchingPendingVnpayPayment(course.id);
+
+      setPendingVnpayPayment(pendingPayment);
+
+      if (pendingPayment) {
+        setMethod("vnpay");
+      }
+    };
+
+    restorePendingVnpayPayment();
+    window.addEventListener("pageshow", restorePendingVnpayPayment);
+
+    return () => {
+      window.removeEventListener("pageshow", restorePendingVnpayPayment);
+    };
+  }, [course.id]);
+
+  useEffect(() => {
     if (!accessToken) {
-      setBusyAction(null);
       return;
     }
 
@@ -133,6 +158,12 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
         return;
       }
 
+      if (method === "vnpay" && pendingVnpayPayment?.paymentUrl) {
+        setBusyAction("vnpay");
+        window.location.assign(pendingVnpayPayment.paymentUrl);
+        return;
+      }
+
       setBusyAction("vnpay");
       const payment = await createVnpayPaymentUrl(
         {
@@ -141,13 +172,16 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
         },
         accessToken,
       );
-
-      savePendingVnpayPayment({
+      const pendingPayment = {
         courseId: course.id,
         courseSlug: course.slug,
         courseTitle: course.title,
+        paymentUrl: payment.paymentUrl,
         txnRef: payment.txnRef,
-      });
+      };
+
+      savePendingVnpayPayment(pendingPayment);
+      setPendingVnpayPayment(pendingPayment);
 
       window.location.assign(payment.paymentUrl);
     } catch (paymentError) {
@@ -221,6 +255,12 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
     setError(null);
   }
 
+  function resetPendingVnpayPayment() {
+    clearPendingVnpayPayment();
+    setPendingVnpayPayment(null);
+    setError(null);
+  }
+
   return (
     <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
       <div className="rounded-lg border border-border bg-card p-5">
@@ -257,6 +297,13 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
           </section>
         ) : null}
 
+        {method === "vnpay" && pendingVnpayPayment ? (
+          <PendingVnpayPanel
+            onStartNew={resetPendingVnpayPayment}
+            pendingPayment={pendingVnpayPayment}
+          />
+        ) : null}
+
         {simulationPayment ? (
           <SimulationGateway
             busyAction={busyAction}
@@ -287,6 +334,8 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
               isFree,
               method,
               hasFailedSimulation: simulationPayment?.status === "failed",
+              hasPendingVnpayPayment:
+                method === "vnpay" && Boolean(pendingVnpayPayment?.paymentUrl),
             })}
           </button>
         ) : null}
@@ -333,6 +382,40 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
           Paid enrollment is activated after the selected payment flow confirms.
         </p>
       </aside>
+    </section>
+  );
+}
+
+function PendingVnpayPanel({
+  onStartNew,
+  pendingPayment,
+}: {
+  onStartNew: () => void;
+  pendingPayment: PendingVnpayPayment;
+}) {
+  return (
+    <section className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-4">
+      <p className="text-sm font-semibold text-primary">
+        VNPay session ready
+      </p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        You started a VNPay payment for {pendingPayment.courseTitle}. If you
+        came back from the VNPay sandbox, you can continue that payment session.
+      </p>
+      <dl className="mt-4 grid gap-2 text-sm">
+        <PaymentRow label="Course" value={pendingPayment.courseTitle} />
+        <PaymentRow
+          label="Transaction"
+          value={pendingPayment.txnRef ?? "Pending"}
+        />
+      </dl>
+      <button
+        className="mt-4 inline-flex min-h-10 items-center justify-center rounded-pill border border-primary bg-transparent px-5 text-sm font-normal text-primary transition-transform active:scale-95"
+        onClick={onStartNew}
+        type="button"
+      >
+        Start new VNPay session
+      </button>
     </section>
   );
 }
@@ -479,6 +562,7 @@ function PaymentRow({ label, value }: { label: string; value: string }) {
 function getPrimaryLabel(input: {
   busyAction: BusyAction;
   hasFailedSimulation: boolean;
+  hasPendingVnpayPayment: boolean;
   isFree: boolean;
   method: CheckoutMethod;
 }) {
@@ -504,7 +588,23 @@ function getPrimaryLabel(input: {
       : "Start simulation payment";
   }
 
+  if (input.hasPendingVnpayPayment) {
+    return "Resume VNPay payment";
+  }
+
   return "Pay with VNPay Test";
+}
+
+function getMatchingPendingVnpayPayment(
+  courseId: string,
+): PendingVnpayPayment | null {
+  const pendingPayment = getPendingVnpayPayment();
+
+  if (pendingPayment?.courseId !== courseId) {
+    return null;
+  }
+
+  return pendingPayment;
 }
 
 function buildQrCells(seed: string) {
