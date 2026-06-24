@@ -18,12 +18,12 @@ export function LessonHeader({
   const { lesson, lessonNumber, section, sectionNumber } = lessonBundle;
 
   return (
-    <section className="rounded-lg border-2 border-foreground/80 bg-white p-4 shadow-[5px_5px_0_#1d1d1f] sm:p-5">
+    <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="flex flex-wrap gap-2 text-sm font-semibold">
-        <span className="rounded-pill border-2 border-foreground/80 bg-[#dff6ee] px-3 py-1">
+        <span className="rounded-md border border-border bg-surface-pearl px-3 py-1">
           Section {sectionNumber}
         </span>
-        <span className="rounded-pill border-2 border-foreground/80 bg-[#fffdf7] px-3 py-1">
+        <span className="rounded-md border border-border bg-background px-3 py-1">
           Lesson {lessonNumber}
         </span>
       </div>
@@ -83,7 +83,7 @@ function LessonNavigationLink({
   return (
     <Link
       className={[
-        "min-h-14 rounded-md border-2 border-foreground/80 bg-[#ffe8a3] px-4 py-2 text-sm font-semibold shadow-[3px_3px_0_#1d1d1f] transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none sm:max-w-[48%]",
+        "min-h-14 rounded-md border border-border bg-background px-4 py-2 text-sm font-semibold transition-colors hover:border-primary hover:text-primary sm:max-w-[48%]",
         align === "right" ? "text-left sm:text-right" : "text-left",
       ].join(" ")}
       href={href}
@@ -104,7 +104,7 @@ function DisabledNavigation({
   return (
     <span
       className={[
-        "min-h-14 rounded-md border-2 border-foreground/25 bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground sm:max-w-[48%]",
+        "min-h-14 rounded-md border border-border bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground sm:max-w-[48%]",
         align === "right" ? "text-left sm:text-right" : "text-left",
       ].join(" ")}
     >

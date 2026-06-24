@@ -12,13 +12,13 @@ e-learning-fe
 ├─ .prettierignore
 ├─ AGENTS.md
 ├─ CLAUDE.md
-├─ DESIGN_Appple.md
 ├─ eslint.config.mjs
 ├─ next.config.ts
 ├─ package-lock.json
 ├─ package.json
 ├─ postcss.config.mjs
 ├─ prettier.config.js
+├─ production_elearning_learning_page_design.md
 ├─ public
 │  ├─ file.svg
 │  ├─ globe.svg
@@ -44,6 +44,15 @@ e-learning-fe
 │  │  ├─ courses
 │  │  │  ├─ page.tsx
 │  │  │  └─ [slug]
+│  │  │     ├─ learn
+│  │  │     │  ├─ assessments
+│  │  │     │  │  └─ [assessmentId]
+│  │  │     │  │     └─ attempts
+│  │  │     │  │        └─ [attemptId]
+│  │  │     │  │           ├─ page.tsx
+│  │  │     │  │           └─ result
+│  │  │     │  │              └─ page.tsx
+│  │  │     │  └─ page.tsx
 │  │  │     ├─ page.tsx
 │  │  │     └─ payment
 │  │  │        └─ page.tsx
@@ -56,6 +65,12 @@ e-learning-fe
 │  │  ├─ my-courses
 │  │  │  └─ page.tsx
 │  │  ├─ page.tsx
+│  │  ├─ payments
+│  │  │  └─ vnpay
+│  │  │     └─ return
+│  │  │        └─ page.tsx
+│  │  ├─ profile
+│  │  │  └─ page.tsx
 │  │  ├─ register
 │  │  │  └─ page.tsx
 │  │  ├─ reset-password
@@ -64,8 +79,10 @@ e-learning-fe
 │  │     ├─ home-content.ts
 │  │     ├─ home-page.tsx
 │  │     └─ sections
+│  │        ├─ category-section.tsx
 │  │        ├─ featured-courses-section.tsx
 │  │        ├─ final-cta-section.tsx
+│  │        ├─ footer-section.tsx
 │  │        ├─ hero-section.tsx
 │  │        ├─ role-section.tsx
 │  │        └─ stats-section.tsx
@@ -77,6 +94,7 @@ e-learning-fe
 │  │  │     ├─ desktop-nav.tsx
 │  │  │     ├─ mobile-nav-link.tsx
 │  │  │     ├─ nav-link.tsx
+│  │  │     ├─ navbar-search.tsx
 │  │  │     ├─ public-navbar.tsx
 │  │  │     └─ user-menu.tsx
 │  │  ├─ shared
@@ -86,7 +104,29 @@ e-learning-fe
 │  │     ├─ README.md
 │  │     └─ section-header.tsx
 │  ├─ features
-│  │  ├─ admin
+│  │  ├─ assessments
+│  │  │  ├─ api
+│  │  │  │  └─ assessment-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ assessment-attempt-page.tsx
+│  │  │  │  ├─ assessment-attempt-route-client.tsx
+│  │  │  │  ├─ attempt-history.tsx
+│  │  │  │  ├─ attempt-result-route-client.tsx
+│  │  │  │  ├─ attempt-result.tsx
+│  │  │  │  ├─ learner-assessment-entry.tsx
+│  │  │  │  ├─ project-submission-form.tsx
+│  │  │  │  ├─ quiz-question-card.tsx
+│  │  │  │  └─ quiz-timer.tsx
+│  │  │  ├─ hooks
+│  │  │  │  ├─ use-assessment-attempt.ts
+│  │  │  │  ├─ use-attempt-result.ts
+│  │  │  │  ├─ use-learner-assessment.ts
+│  │  │  │  └─ use-learner-course-assessments.ts
+│  │  │  ├─ types
+│  │  │  │  └─ assessment.ts
+│  │  │  └─ utils
+│  │  │     ├─ assessment-labels.ts
+│  │  │     └─ assessment-time.ts
 │  │  ├─ auth
 │  │  │  ├─ api
 │  │  │  │  └─ auth-api.ts
@@ -106,7 +146,6 @@ e-learning-fe
 │  │  │  │  └─ use-auth.ts
 │  │  │  └─ types
 │  │  │     └─ auth.ts
-│  │  ├─ categories
 │  │  ├─ courses
 │  │  │  ├─ api
 │  │  │  │  └─ course-api.ts
@@ -121,6 +160,7 @@ e-learning-fe
 │  │  │  │  ├─ course-pagination.tsx
 │  │  │  │  ├─ course-search.tsx
 │  │  │  │  └─ courses-header.tsx
+│  │  │  ├─ mocks
 │  │  │  ├─ types
 │  │  │  │  └─ course.ts
 │  │  │  └─ utils
@@ -136,9 +176,41 @@ e-learning-fe
 │  │  │  │  └─ payment-checkout.tsx
 │  │  │  └─ types
 │  │  │     └─ enrollment.ts
-│  │  ├─ instructor
 │  │  ├─ learning
+│  │  │  ├─ api
+│  │  │  │  └─ learning-course-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ course-curriculum-sidebar.tsx
+│  │  │  │  ├─ course-learning-content.tsx
+│  │  │  │  ├─ learning-course-page.tsx
+│  │  │  │  ├─ learning-page-states.tsx
+│  │  │  │  ├─ lesson-content-viewer.tsx
+│  │  │  │  ├─ lesson-header.tsx
+│  │  │  │  └─ lesson-tabs.tsx
+│  │  │  ├─ mocks
+│  │  │  │  └─ course-learning.ts
+│  │  │  ├─ types
+│  │  │  │  └─ learning-course.ts
+│  │  │  └─ utils
+│  │  │     ├─ learning-course.ts
+│  │  │     └─ media-url.ts
+│  │  ├─ payments
+│  │  │  ├─ api
+│  │  │  │  └─ payment-api.ts
+│  │  │  ├─ components
+│  │  │  │  ├─ vnpay-checkout.tsx
+│  │  │  │  └─ vnpay-return-content.tsx
+│  │  │  ├─ types
+│  │  │  │  └─ payment.ts
+│  │  │  └─ utils
+│  │  │     └─ pending-vnpay-payment.ts
 │  │  └─ users
+│  │     ├─ api
+│  │     │  └─ profile-api.ts
+│  │     ├─ components
+│  │     │  └─ edit-profile-form.tsx
+│  │     └─ types
+│  │        └─ profile.ts
 │  ├─ hooks
 │  ├─ lib
 │  │  ├─ api

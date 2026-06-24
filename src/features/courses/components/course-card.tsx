@@ -21,16 +21,18 @@ export function CourseCard({ course }: CourseCardProps) {
   const primaryInstructor = course.instructors?.[0]?.fullName;
 
   return (
-    <article className="flex h-full flex-col rounded-lg border border-border bg-card p-4">
+    <article className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
       <CourseImage course={course} />
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Badge>{formatCourseLevel(course.level)}</Badge>
-        {course.certificateEnabled ? <Badge variant="action">Certificate</Badge> : null}
-      </div>
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge>{formatCourseLevel(course.level)}</Badge>
+          {course.certificateEnabled ? (
+            <Badge variant="action">Certificate</Badge>
+          ) : null}
+        </div>
 
-      <div className="mt-4 flex flex-1 flex-col">
-        <h2 className="text-xl font-semibold leading-tight">
+        <h2 className="mt-4 text-lg font-semibold leading-snug">
           <Link
             className="transition-colors hover:text-primary"
             href={`/courses/${course.slug}`}
@@ -47,21 +49,21 @@ export function CourseCard({ course }: CourseCardProps) {
           <div className="mt-4 flex flex-wrap gap-2">
             {visibleCategories.map((category) => (
               <span
-                className="rounded-pill bg-muted px-3 py-1 text-xs text-ink-muted"
+                className="rounded-md bg-muted px-2.5 py-1 text-xs text-ink-muted"
                 key={category.id}
               >
                 {category.name}
               </span>
             ))}
             {remainingCategoryCount > 0 ? (
-              <span className="rounded-pill bg-muted px-3 py-1 text-xs text-ink-muted">
+              <span className="rounded-md bg-muted px-2.5 py-1 text-xs text-ink-muted">
                 +{remainingCategoryCount}
               </span>
             ) : null}
           </div>
         ) : null}
 
-        <div className="mt-5 grid gap-2 text-sm text-muted-foreground">
+        <div className="mt-5 grid gap-2 border-t border-border pt-4 text-sm text-muted-foreground">
           <div className="flex items-center justify-between gap-3">
             <span>Duration</span>
             <span className="text-foreground">
@@ -83,6 +85,13 @@ export function CourseCard({ course }: CourseCardProps) {
             </div>
           ) : null}
         </div>
+
+        <Link
+          className="mt-auto pt-5 text-sm font-semibold text-primary transition-colors hover:text-primary-focus"
+          href={`/courses/${course.slug}`}
+        >
+          View course details
+        </Link>
       </div>
     </article>
   );

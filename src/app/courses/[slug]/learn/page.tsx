@@ -1,3 +1,5 @@
+//src\app\courses\[slug]\learn\page.tsx
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 

@@ -129,9 +129,9 @@ export function EnrollmentCta({ course }: EnrollmentCtaProps) {
 }
 
 const primaryButtonClasses =
-  "inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95";
+  "inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus";
 const secondaryButtonClasses =
-  "inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-border bg-background px-6 text-base font-normal text-foreground transition-colors hover:border-primary hover:text-primary";
+  "inline-flex min-h-11 w-full items-center justify-center rounded-md border border-border bg-background px-6 text-base font-semibold text-foreground transition-colors hover:border-primary hover:text-primary";
 
 function CtaShell({
   children,
@@ -146,11 +146,13 @@ function CtaShell({
 }) {
   return (
     <section className="mt-5 border-t border-border pt-5">
-      <p className="text-sm font-semibold text-primary">{eyebrow}</p>
-      <p className="mt-2 text-2xl font-semibold">
+      <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+        {eyebrow}
+      </p>
+      <p className="mt-2 text-3xl font-semibold">
         {formatCoursePrice(course.price)}
       </p>
-      <p className="text-sm leading-6 text-muted-foreground">{message}</p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{message}</p>
       {children ? <div className="mt-4">{children}</div> : null}
     </section>
   );

@@ -7,19 +7,15 @@ type MyCoursesPaginationProps = {
 };
 
 export function MyCoursesPagination({ meta }: MyCoursesPaginationProps) {
-  if (meta.totalPages <= 1) {
-    return null;
-  }
-
   const pages = getVisiblePages(meta.page, meta.totalPages);
 
   return (
     <nav
       aria-label="My courses pagination"
-      className="flex flex-col items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 sm:flex-row"
+      className="relative z-10 mt-1 flex w-full flex-col items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 shadow-sm sm:flex-row"
     >
       <p className="text-sm text-muted-foreground">
-        Page {meta.page} of {meta.totalPages}
+        Page {meta.page} of {Math.max(meta.totalPages, 1)}
       </p>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <PaginationLink
@@ -27,12 +23,12 @@ export function MyCoursesPagination({ meta }: MyCoursesPaginationProps) {
           href={buildMyCoursesHref(meta.page - 1)}
           label="Previous"
         />
-        <div className="hidden items-center gap-2 sm:flex">
+        <div className="flex items-center gap-2">
           {pages.map((page) => (
             <Link
               aria-current={page === meta.page ? "page" : undefined}
               className={[
-                "inline-flex size-9 items-center justify-center rounded-pill border text-sm",
+                "inline-flex size-9 items-center justify-center rounded-md border text-sm",
                 page === meta.page
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border text-foreground hover:border-primary hover:text-primary",
@@ -65,7 +61,7 @@ function PaginationLink({
 }) {
   if (disabled) {
     return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-pill border border-border px-4 text-sm text-muted-foreground opacity-60">
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-border px-4 text-sm text-muted-foreground opacity-60">
         {label}
       </span>
     );
@@ -73,7 +69,7 @@ function PaginationLink({
 
   return (
     <Link
-      className="inline-flex min-h-9 items-center justify-center rounded-pill border border-border px-4 text-sm transition-colors hover:border-primary hover:text-primary"
+      className="inline-flex min-h-9 items-center justify-center rounded-md border border-border px-4 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
       href={href}
     >
       {label}

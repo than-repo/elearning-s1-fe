@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-import type { LearningSection } from "../types/learning-course";
+import type {
+  LearningAssessment,
+  LearningSection,
+} from "../types/learning-course";
+
 import {
   getOrderedLessons,
   mediaTypeLabels,
@@ -9,33 +13,95 @@ import {
 } from "../utils/learning-course";
 
 type CourseCurriculumSidebarProps = {
+  activeAssessmentId?: string;
   activeLessonId?: string;
+  assessments?: LearningAssessment[];
   courseSlug: string;
   onLessonClick?: () => void;
   sections: LearningSection[];
 };
 
+function getOrderedAssessments(assessments: LearningAssessment[]) {
+  return [...assessments].sort((firstAssessment, secondAssessment) => {
+    if (firstAssessment.order !== secondAssessment.order) {
+      return firstAssessment.order - secondAssessment.order;
+    }
+
+    return firstAssessment.title.localeCompare(secondAssessment.title);
+  });
+}
+
+function getAssessmentTypeLabel(type: LearningAssessment["type"]) {
+  switch (type) {
+    case "QUIZ":
+      return "Quiz";
+    case "PROJECT":
+      return "Project";
+    default:
+      return type;
+  }
+}
+
+function getAssessmentTypeMark(type: LearningAssessment["type"]) {
+  switch (type) {
+    case "QUIZ":
+      return "Q";
+    case "PROJECT":
+      return "P";
+    default:
+      return "A";
+  }
+}
+
+function getAssessmentMeta(assessment: LearningAssessment) {
+  const parts: string[] = [];
+
+  parts.push(`${assessment.totalPoints} pts`);
+
+  if (assessment.timeLimitMinutes) {
+    parts.push(`${assessment.timeLimitMinutes} min`);
+  }
+
+  if (assessment.maxAttempts) {
+    parts.push(`${assessment.maxAttempts} attempts`);
+  }
+
+  return parts.join(" · ");
+}
+
 export function CourseCurriculumSidebar({
+  activeAssessmentId,
   activeLessonId,
+  assessments = [],
   courseSlug,
   onLessonClick,
   sections,
 }: CourseCurriculumSidebarProps) {
+  const orderedAssessments = getOrderedAssessments(assessments);
+  const hasAssessments = orderedAssessments.length > 0;
+
   return (
-    <section className="rounded-lg border-2 border-foreground/80 bg-white p-4 shadow-[5px_5px_0_#1d1d1f]">
+    <section className="rounded-lg border border-border bg-card p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-primary">Course content</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+            Course content
+          </p>
+
           <h2 className="mt-1 text-xl font-semibold leading-tight">
             Curriculum
           </h2>
         </div>
-        <span className="shrink-0 rounded-pill border-2 border-foreground/80 bg-[#dff6ee] px-3 py-1 text-sm font-semibold">
-          {sections.length}
+
+        <span className="shrink-0 rounded-md border border-border bg-surface-pearl px-3 py-1 text-sm font-semibold">
+          {sections.length + (hasAssessments ? 1 : 0)}
         </span>
       </div>
 
-      <nav aria-label="Course lessons" className="mt-4 grid gap-4">
+      <nav
+        aria-label="Course lessons and assessments"
+        className="mt-4 grid gap-4"
+      >
         {sections.map((section, sectionIndex) => {
           const lessons = getOrderedLessons(section.lessons);
           const hasActiveLesson = lessons.some(
@@ -44,19 +110,21 @@ export function CourseCurriculumSidebar({
 
           return (
             <details
-              className="rounded-md border-2 border-foreground/40 bg-[#fffdf7] p-3 open:border-foreground/80"
+              className="rounded-md border border-border bg-background p-3 open:border-primary/40"
               key={section.id}
               open={hasActiveLesson || sectionIndex === 0}
             >
               <summary className="cursor-pointer list-none">
                 <div className="flex items-start gap-3">
-                  <span className="grid size-8 shrink-0 place-items-center rounded-full border-2 border-foreground/80 bg-[#ffe8a3] text-sm font-semibold">
+                  <span className="grid size-8 shrink-0 place-items-center rounded-md border border-border bg-surface-pearl text-sm font-semibold">
                     {sectionIndex + 1}
                   </span>
+
                   <div className="min-w-0 flex-1">
                     <h3 className="break-words text-sm font-semibold leading-snug">
                       {section.title}
                     </h3>
+
                     <p className="mt-1 text-xs text-muted-foreground">
                       {lessons.length} lessons
                     </p>
@@ -65,7 +133,7 @@ export function CourseCurriculumSidebar({
               </summary>
 
               {section.description ? (
-                <p className="mt-3 border-l-2 border-dashed border-foreground/40 pl-3 text-xs leading-5 text-muted-foreground">
+                <p className="mt-3 whitespace-pre-line break-words border-l border-border pl-3 text-xs leading-5 text-muted-foreground">
                   {section.description}
                 </p>
               ) : null}
@@ -79,27 +147,32 @@ export function CourseCurriculumSidebar({
                     <Link
                       aria-current={isActive ? "page" : undefined}
                       className={[
-                        "grid grid-cols-[32px_minmax(0,1fr)] gap-3 rounded-md border-2 p-3 text-left transition-transform active:translate-x-0.5 active:translate-y-0.5",
+                        "grid grid-cols-[32px_minmax(0,1fr)] gap-3 rounded-md border p-3 text-left transition-colors",
                         isActive
-                          ? "border-foreground bg-[#ffe8a3] shadow-[3px_3px_0_#1d1d1f]"
-                          : "border-foreground/30 bg-white hover:border-foreground/80",
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-card hover:border-primary/50",
                       ].join(" ")}
-                      href={`/courses/${courseSlug}/learn?lesson=${encodeURIComponent(lesson.id)}`}
+                      href={`/courses/${courseSlug}/learn?lesson=${encodeURIComponent(
+                        lesson.id,
+                      )}`}
                       key={lesson.id}
                       onClick={onLessonClick}
                     >
-                      <span className="grid size-8 place-items-center rounded-md border-2 border-foreground/70 bg-[#dff6ee] text-xs font-semibold">
+                      <span className="grid size-8 place-items-center rounded-md border border-border bg-surface-pearl text-xs font-semibold text-foreground">
                         {primaryFile
                           ? mediaTypeMarks[primaryFile.type]
                           : lessonIndex + 1}
                       </span>
+
                       <span className="min-w-0">
                         <span className="block text-xs font-semibold text-ink-muted">
                           Lesson {lessonIndex + 1}
                         </span>
+
                         <span className="mt-1 block break-words text-sm font-semibold leading-snug">
                           {lesson.title}
                         </span>
+
                         <span className="mt-1 block text-xs text-muted-foreground">
                           {primaryFile
                             ? mediaTypeLabels[primaryFile.type]
@@ -114,6 +187,76 @@ export function CourseCurriculumSidebar({
             </details>
           );
         })}
+
+        {hasAssessments ? (
+          <details
+            className="rounded-md border border-border bg-background p-3 open:border-primary/40"
+            open={Boolean(activeAssessmentId)}
+          >
+            <summary className="cursor-pointer list-none">
+              <div className="flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center rounded-md border border-primary/30 bg-primary/10 text-sm font-semibold text-primary">
+                  A
+                </span>
+
+                <div className="min-w-0 flex-1">
+                  <h3 className="break-words text-sm font-semibold leading-snug">
+                    Assessments
+                  </h3>
+
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {orderedAssessments.length}{" "}
+                    {orderedAssessments.length === 1
+                      ? "assessment"
+                      : "assessments"}
+                  </p>
+                </div>
+              </div>
+            </summary>
+
+            <div className="mt-3 grid gap-2">
+              {orderedAssessments.map((assessment, assessmentIndex) => {
+                const isActive = assessment.id === activeAssessmentId;
+
+                return (
+                  <Link
+                    aria-current={isActive ? "page" : undefined}
+                    className={[
+                      "grid grid-cols-[32px_minmax(0,1fr)] gap-3 rounded-md border p-3 text-left transition-colors",
+                      isActive
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card hover:border-primary/50",
+                    ].join(" ")}
+                    href={`/courses/${courseSlug}/learn?assessment=${encodeURIComponent(
+                      assessment.id,
+                    )}`}
+                    key={assessment.id}
+                    onClick={onLessonClick}
+                  >
+                    <span className="grid size-8 place-items-center rounded-md border border-border bg-surface-pearl text-xs font-semibold text-foreground">
+                      {getAssessmentTypeMark(assessment.type)}
+                    </span>
+
+                    <span className="min-w-0">
+                      <span className="block text-xs font-semibold text-ink-muted">
+                        {getAssessmentTypeLabel(assessment.type)}{" "}
+                        {assessmentIndex + 1}
+                      </span>
+
+                      <span className="mt-1 block break-words text-sm font-semibold leading-snug">
+                        {assessment.title}
+                      </span>
+
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        {getAssessmentMeta(assessment)}
+                      </span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </details>
+        ) : null}
       </nav>
     </section>
   );

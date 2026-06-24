@@ -17,22 +17,24 @@ export function MyCourseCard({ enrollment }: MyCourseCardProps) {
   }
 
   return (
-    <article className="flex h-full flex-col rounded-lg border border-border bg-card p-4">
+    <article className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
       <EnrollmentCourseImage course={course} />
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="rounded-pill bg-muted px-3 py-1 text-xs text-ink-muted">
-          {formatEnrollmentStatus(enrollment.status)}
-        </span>
-        {enrollment.payment ? (
-          <span className="rounded-pill border border-border px-3 py-1 text-xs text-muted-foreground">
-            {enrollment.payment.status}
+      <div className="flex flex-1 flex-col p-4">
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+            {formatEnrollmentStatus(enrollment.status)}
           </span>
-        ) : null}
-      </div>
+          {enrollment.payment ? (
+            <span className="rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground">
+              {enrollment.payment.status}
+            </span>
+          ) : null}
+        </div>
 
-      <div className="mt-4 flex flex-1 flex-col">
-        <h2 className="text-xl font-semibold leading-tight">{course.title}</h2>
+        <h2 className="mt-4 text-lg font-semibold leading-snug">
+          {course.title}
+        </h2>
         <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
           {course.shortDescription}
         </p>
@@ -44,9 +46,9 @@ export function MyCourseCard({ enrollment }: MyCourseCardProps) {
               {Math.round(enrollment.progressPercentage)}%
             </span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-pill bg-muted">
+          <div className="mt-2 h-2 overflow-hidden rounded-md bg-muted">
             <div
-              className="h-full rounded-pill bg-primary"
+              className="h-full rounded-md bg-primary"
               style={{
                 width: `${Math.min(Math.max(enrollment.progressPercentage, 0), 100)}%`,
               }}
@@ -54,7 +56,7 @@ export function MyCourseCard({ enrollment }: MyCourseCardProps) {
           </div>
         </div>
 
-        <dl className="mt-5 grid gap-2 text-sm text-muted-foreground">
+        <dl className="mt-5 grid gap-2 border-t border-border pt-4 text-sm text-muted-foreground">
           <CardRow
             label="Enrolled"
             value={formatDate(enrollment.enrolledAt ?? enrollment.createdAt)}
@@ -62,12 +64,14 @@ export function MyCourseCard({ enrollment }: MyCourseCardProps) {
           <CardRow label="Level" value={course.level} />
         </dl>
 
-        <Link
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95"
-          href={`/courses/${course.slug}/learn`}
-        >
-          Continue learning
-        </Link>
+        <div className="mt-auto pt-5">
+          <Link
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus"
+            href={`/courses/${course.slug}/learn`}
+          >
+            Continue learning
+          </Link>
+        </div>
       </div>
     </article>
   );

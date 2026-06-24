@@ -17,12 +17,14 @@ const navLinks = [
 
 export default function MyCoursesPage() {
   return (
-    <main className="min-h-screen bg-muted text-foreground">
+    <main className="min-h-screen bg-surface-pearl text-foreground">
       <PublicNavbar brandLabel="E-Learning System" links={navLinks} />
       <RoleProtectedRoute allowedRoles={["LEARNER"]} fallbackHref="/courses">
-        <section className="mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
-          <div className="mb-6">
-            <p className="text-sm font-semibold text-primary">Learner space</p>
+        <section className="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
+          <div className="mb-6 rounded-lg border border-border bg-card p-6 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+              Learner dashboard
+            </p>
             <h1 className="mt-2 text-4xl font-semibold leading-tight sm:text-5xl">
               My Courses
             </h1>

@@ -110,8 +110,8 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
 
   return (
     <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-      <div className="rounded-lg border border-border bg-card p-5">
-        <p className="text-sm font-semibold text-primary">
+      <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">
           Simulated secure payment
         </p>
         <h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight">
@@ -136,7 +136,7 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
                     : "A simulated VN_PAY payment will be completed immediately."}
                 </p>
               </div>
-              <span className="rounded-pill bg-primary px-3 py-1 text-sm text-primary-foreground">
+              <span className="rounded-md bg-primary px-3 py-1 text-sm text-primary-foreground">
                 Selected
               </span>
             </div>
@@ -150,7 +150,7 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
         ) : null}
 
         <button
-          className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           disabled={isChecking || isSubmitting}
           onClick={handlePayment}
           type="button"
@@ -163,7 +163,7 @@ function PaymentCheckoutContent({ course }: PaymentCheckoutProps) {
         </button>
       </div>
 
-      <aside className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-16">
+      <aside className="rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-20">
         <CourseImage course={course} />
         <h2 className="mt-4 text-xl font-semibold leading-tight">
           {course.title}

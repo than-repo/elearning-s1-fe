@@ -27,7 +27,7 @@ export function CourseSearch({ initialValue = "" }: CourseSearchProps) {
         value={search}
       />
       <p className="text-sm text-muted-foreground">
-        Search text is applied together with filters.
+        Search courses by title, topic, or description.
       </p>
     </div>
   );

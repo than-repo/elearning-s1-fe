@@ -44,19 +44,19 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
   const categoryOptions = flattenCategoryGroups(categoryGroups);
 
   return (
-    <main className="min-h-screen bg-muted text-foreground">
+    <main className="min-h-screen bg-surface-pearl text-foreground">
       <PublicNavbar brandLabel="E-Learning System" links={navLinks} />
       <CoursesHeader total={courses?.meta.total ?? 0} />
 
-      <section className="mx-auto grid w-full max-w-[1440px] gap-5 px-5 pb-16 sm:px-8 lg:grid-cols-[280px_1fr] lg:px-12 lg:pb-24">
-        <aside className="lg:sticky lg:top-16 lg:self-start">
+      <section className="mx-auto grid w-full max-w-[1440px] gap-6 px-5 py-8 sm:px-8 lg:grid-cols-[280px_minmax(0,1fr)] lg:px-12 lg:py-10">
+        <aside className="lg:sticky lg:top-20 lg:self-start">
           <Suspense fallback={null}>
             <CourseFilters categoryGroups={categoryGroups} query={query} />
           </Suspense>
         </aside>
 
         <div className="grid gap-5">
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div className="rounded-lg border border-border bg-card p-4 shadow-sm">
             <Suspense fallback={null}>
               <CourseSearch initialValue={query.search} />
             </Suspense>

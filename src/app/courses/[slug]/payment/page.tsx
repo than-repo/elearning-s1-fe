@@ -26,9 +26,9 @@ export default async function CoursePaymentPage({
   const course = await getCourseOrNotFound(slug);
 
   return (
-    <main className="min-h-screen bg-muted text-foreground">
+    <main className="min-h-screen bg-surface-pearl text-foreground">
       <PublicNavbar brandLabel="E-Learning System" links={navLinks} />
-      <section className="mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
+      <section className="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
         <VnpayCheckout course={course} />
       </section>
     </main>

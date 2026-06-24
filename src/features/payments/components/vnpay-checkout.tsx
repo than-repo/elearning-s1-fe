@@ -263,8 +263,8 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
 
   return (
     <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
-      <div className="rounded-lg border border-border bg-card p-5">
-        <p className="text-sm font-semibold text-primary">
+      <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">
           {isFree ? "Free enrollment" : "Course payment"}
         </p>
         <h1 className="mt-3 max-w-2xl text-4xl font-semibold leading-tight">
@@ -324,7 +324,7 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
 
         {!simulationPayment || simulationPayment.status === "failed" ? (
           <button
-            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             disabled={isChecking || isBusy}
             onClick={handlePrimaryAction}
             type="button"
@@ -341,7 +341,7 @@ function PaymentCheckoutContent({ course }: VnpayCheckoutProps) {
         ) : null}
       </div>
 
-      <aside className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-16">
+      <aside className="rounded-lg border border-border bg-card p-5 shadow-sm lg:sticky lg:top-20">
         <CourseImage course={course} />
         <h2 className="mt-4 text-xl font-semibold leading-tight">
           {course.title}
@@ -410,7 +410,7 @@ function PendingVnpayPanel({
         />
       </dl>
       <button
-        className="mt-4 inline-flex min-h-10 items-center justify-center rounded-pill border border-primary bg-transparent px-5 text-sm font-normal text-primary transition-transform active:scale-95"
+        className="mt-4 inline-flex min-h-10 items-center justify-center rounded-md border border-primary bg-transparent px-5 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
         onClick={onStartNew}
         type="button"
       >
@@ -515,7 +515,7 @@ function SimulationGateway({
       {isPending ? (
         <div className="mt-5 flex flex-wrap gap-3">
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isProcessing}
             onClick={onConfirm}
             type="button"
@@ -523,7 +523,7 @@ function SimulationGateway({
             {busyAction === "simulation-confirm" ? "Confirming..." : "I have paid"}
           </button>
           <button
-            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-danger bg-transparent px-6 text-base font-normal text-danger transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-11 items-center justify-center rounded-md border border-danger bg-transparent px-6 text-base font-semibold text-danger transition-colors hover:bg-danger/5 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isProcessing}
             onClick={onFail}
             type="button"
@@ -537,7 +537,7 @@ function SimulationGateway({
 
       {isFailed ? (
         <button
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-transparent px-6 text-base font-normal text-primary transition-transform active:scale-95"
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md border border-primary bg-transparent px-6 text-base font-semibold text-primary transition-colors hover:bg-primary/5"
           onClick={onRetry}
           type="button"
         >

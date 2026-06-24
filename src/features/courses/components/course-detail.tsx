@@ -20,20 +20,19 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
       <article className="grid gap-5">
-        <section className="rounded-lg border border-border bg-card p-5">
-          <CourseImage course={course} />
-          <div className="mt-6 flex flex-wrap gap-2">
-            <span className="rounded-pill bg-muted px-3 py-1 text-sm text-ink-muted">
+        <section className="rounded-lg bg-surface-black px-5 py-8 text-white shadow-sm sm:px-7 lg:px-8 lg:py-10">
+          <div className="flex flex-wrap gap-2">
+            <span className="rounded-md border border-white/15 bg-white/10 px-3 py-1 text-sm text-white">
               {formatCourseLevel(course.level)}
             </span>
             {course.certificateEnabled ? (
-              <span className="rounded-pill bg-primary/10 px-3 py-1 text-sm text-primary">
+              <span className="rounded-md border border-primary-on-dark/30 bg-primary-on-dark/15 px-3 py-1 text-sm text-primary-on-dark">
                 Certificate
               </span>
             ) : null}
             {categoryNames.slice(0, 3).map((categoryName) => (
               <span
-                className="rounded-pill border border-border px-3 py-1 text-sm text-muted-foreground"
+                className="rounded-md border border-white/15 px-3 py-1 text-sm text-white/80"
                 key={categoryName}
               >
                 {categoryName}
@@ -44,17 +43,32 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
           <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight sm:text-5xl">
             {course.title}
           </h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-white/75">
             {course.shortDescription}
           </p>
+          <dl className="mt-6 grid gap-3 text-sm text-white/75 sm:grid-cols-3">
+            <HeroFact
+              label="Instructor"
+              value={primaryInstructor ?? "Not assigned"}
+            />
+            <HeroFact
+              label="Duration"
+              value={formatCourseDuration(course.durationInMinutes)}
+            />
+            <HeroFact
+              label="Language"
+              value={course.language ?? "Not specified"}
+            />
+          </dl>
         </section>
 
-        <aside className="rounded-lg border border-border bg-card p-5 lg:hidden">
+        <aside className="rounded-lg border border-border bg-card p-5 shadow-sm lg:hidden">
+          <CourseImage course={course} />
           <CourseFacts course={course} primaryInstructor={primaryInstructor} />
           {enrollmentPanel}
         </aside>
 
-        <section className="rounded-lg border border-border bg-card p-5">
+        <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
           <SectionTitle title="About this course" />
           {course.description ? (
             <p className="mt-3 whitespace-pre-line leading-7 text-muted-foreground">
@@ -68,11 +82,14 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
         </section>
 
         {course.whatYouWillLearn?.length ? (
-          <section className="rounded-lg border border-border bg-card p-5">
+          <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
             <SectionTitle title="What you will learn" />
             <ul className="mt-4 grid gap-3 text-muted-foreground sm:grid-cols-2">
               {course.whatYouWillLearn.map((item) => (
-                <li className="rounded-md bg-muted px-4 py-3" key={item}>
+                <li
+                  className="rounded-md border border-border bg-surface-pearl px-4 py-3"
+                  key={item}
+                >
                   {item}
                 </li>
               ))}
@@ -81,11 +98,14 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
         ) : null}
 
         {course.requirements?.length ? (
-          <section className="rounded-lg border border-border bg-card p-5">
+          <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
             <SectionTitle title="Requirements" />
             <ul className="mt-4 grid gap-3 text-muted-foreground">
               {course.requirements.map((item) => (
-                <li className="rounded-md bg-muted px-4 py-3" key={item}>
+                <li
+                  className="rounded-md border border-border bg-surface-pearl px-4 py-3"
+                  key={item}
+                >
                   {item}
                 </li>
               ))}
@@ -94,10 +114,24 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
         ) : null}
       </article>
 
-      <aside className="hidden rounded-lg border border-border bg-card p-5 lg:sticky lg:top-16 lg:block">
-        <CourseFacts course={course} primaryInstructor={primaryInstructor} />
-        {enrollmentPanel}
+      <aside className="hidden overflow-hidden rounded-lg border border-border bg-card shadow-lg lg:sticky lg:top-20 lg:block">
+        <CourseImage course={course} />
+        <div className="p-5">
+          <CourseFacts course={course} primaryInstructor={primaryInstructor} />
+          {enrollmentPanel}
+        </div>
       </aside>
+    </div>
+  );
+}
+
+function HeroFact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs font-semibold uppercase tracking-wide text-white/45">
+        {label}
+      </dt>
+      <dd className="mt-1 font-semibold text-white">{value}</dd>
     </div>
   );
 }
@@ -111,8 +145,10 @@ function CourseFacts({
 }) {
   return (
     <>
-      <p className="text-sm font-semibold text-muted-foreground">Course summary</p>
-      <p className="mt-2 text-4xl font-semibold">
+      <p className="mt-5 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        Course summary
+      </p>
+      <p className="mt-2 text-3xl font-semibold">
         {formatCoursePrice(course.price)}
       </p>
       <dl className="mt-5 grid gap-4 text-sm">

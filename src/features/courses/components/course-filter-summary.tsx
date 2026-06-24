@@ -23,7 +23,7 @@ export function CourseFilterSummary({
     <div className="flex flex-wrap items-center gap-2">
       {filters.map((filter) => (
         <Link
-          className="rounded-pill border border-border bg-background px-3 py-1 text-sm text-ink-muted transition-colors hover:border-primary hover:text-primary"
+          className="rounded-md border border-border bg-background px-3 py-1 text-sm text-ink-muted transition-colors hover:border-primary hover:text-primary"
           href={buildCourseHref("/courses", query, {
             [filter.key]: null,
             page: 1,
@@ -33,7 +33,7 @@ export function CourseFilterSummary({
           {filter.label}
         </Link>
       ))}
-      <Link className="px-2 py-1 text-sm text-primary" href="/courses">
+      <Link className="px-2 py-1 text-sm font-semibold text-primary" href="/courses">
         Clear all
       </Link>
     </div>

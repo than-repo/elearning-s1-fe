@@ -35,3 +35,40 @@ export type CourseLearningResponse = {
   thumbnailUrl?: string | null;
   title: string;
 };
+
+export type LearningAssessmentType = "QUIZ" | "PROJECT";
+
+export type LearningAssessmentStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
+
+export type LearningAssessment = {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: LearningAssessmentType;
+
+  order: number;
+  totalPoints: number;
+  passingScore?: number | null;
+
+  maxAttempts?: number | null;
+  timeLimitMinutes?: number | null;
+
+  availableFrom?: string | null;
+  availableUntil?: string | null;
+};
+
+export type LearningCourse = {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  thumbnailUrl?: string | null;
+
+  sections: LearningSection[];
+
+  /**
+   * Course-level assessments.
+   * These do not belong to a section or lesson.
+   */
+  assessments: LearningAssessment[];
+};

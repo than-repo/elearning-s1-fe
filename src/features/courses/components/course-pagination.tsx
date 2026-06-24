@@ -34,7 +34,7 @@ export function CoursePagination({ meta, query }: CoursePaginationProps) {
             <Link
               aria-current={page === meta.page ? "page" : undefined}
               className={[
-                "inline-flex size-9 items-center justify-center rounded-pill border text-sm",
+                "inline-flex size-9 items-center justify-center rounded-md border text-sm",
                 page === meta.page
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border text-foreground hover:border-primary hover:text-primary",
@@ -67,7 +67,7 @@ function PaginationLink({
 }) {
   if (disabled) {
     return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-pill border border-border px-4 text-sm text-muted-foreground opacity-60">
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-border px-4 text-sm text-muted-foreground opacity-60">
         {label}
       </span>
     );
@@ -75,7 +75,7 @@ function PaginationLink({
 
   return (
     <Link
-      className="inline-flex min-h-9 items-center justify-center rounded-pill border border-border px-4 text-sm transition-colors hover:border-primary hover:text-primary"
+      className="inline-flex min-h-9 items-center justify-center rounded-md border border-border px-4 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
       href={href}
     >
       {label}

@@ -18,8 +18,8 @@ export function LessonContentViewer({
   const primaryFile = pickPrimaryFile(lesson.files);
 
   return (
-    <section className="overflow-hidden rounded-lg border-2 border-foreground/80 bg-white shadow-[5px_5px_0_#1d1d1f]">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-foreground/80 bg-[#dff6ee] px-4 py-3">
+    <section className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold">{sectionTitle}</p>
           <p className="mt-1 text-xs text-ink-muted">
@@ -28,7 +28,7 @@ export function LessonContentViewer({
         </div>
         {primaryFile ? (
           <a
-            className="inline-flex min-h-10 items-center justify-center rounded-pill border-2 border-foreground/80 bg-white px-4 text-sm font-semibold shadow-[2px_2px_0_#1d1d1f] transition-transform active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-border bg-card px-4 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
             href={primaryFile.url}
             rel="noreferrer"
             target="_blank"
@@ -38,8 +38,8 @@ export function LessonContentViewer({
         ) : null}
       </div>
 
-      <div className="bg-[#1f2937] p-3 sm:p-4">
-        <div className="grid min-h-[280px] place-items-center overflow-hidden rounded-md border-2 border-white/80 bg-[#111827] text-white sm:min-h-[420px]">
+      <div className="bg-[#111827] p-3 sm:p-4">
+        <div className="grid min-h-[280px] place-items-center overflow-hidden rounded-md bg-black text-white sm:min-h-[420px]">
           <PrimaryFileViewer file={primaryFile} lessonTitle={lesson.title} />
         </div>
       </div>
@@ -128,7 +128,7 @@ function PrimaryFileViewer({
         continue the lesson.
       </p>
       <a
-        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-pill border-2 border-white bg-white px-5 text-sm font-semibold text-foreground transition-transform active:scale-95"
+        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-md border border-white bg-white px-5 text-sm font-semibold text-foreground transition-colors hover:bg-white/90"
         href={file.url}
         rel="noreferrer"
         target="_blank"
@@ -142,7 +142,7 @@ function PrimaryFileViewer({
 function EmptyViewer({ message, title }: { message: string; title: string }) {
   return (
     <div className="w-full max-w-xl px-4 py-10 text-center">
-      <div className="mx-auto grid size-20 place-items-center rounded-full border-2 border-white bg-[#ffe8a3] text-2xl font-semibold text-foreground shadow-[4px_4px_0_#ffffff]">
+      <div className="mx-auto grid size-16 place-items-center rounded-full border border-white/15 bg-white/10 text-xl font-semibold text-white">
         L
       </div>
       <h2 className="mt-4 break-words text-2xl font-semibold leading-tight">
@@ -157,7 +157,7 @@ function EmptyViewer({ message, title }: { message: string; title: string }) {
 
 function MediaMark({ file }: { file: LearningFile }) {
   return (
-    <div className="mx-auto grid size-20 place-items-center rounded-full border-2 border-white bg-[#ffe8a3] text-2xl font-semibold text-foreground shadow-[4px_4px_0_#ffffff]">
+    <div className="mx-auto grid size-16 place-items-center rounded-full border border-white/15 bg-white/10 text-xl font-semibold text-white">
       {mediaTypeMarks[file.type]}
     </div>
   );

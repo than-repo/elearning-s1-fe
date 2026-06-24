@@ -103,7 +103,7 @@ export function MyCoursesContent() {
           Browse the catalog and enroll in a course to see it here.
         </p>
         <Link
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground"
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md border border-primary bg-primary px-6 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary-focus"
           href="/courses"
         >
           Browse courses

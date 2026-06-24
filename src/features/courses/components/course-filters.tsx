@@ -15,7 +15,7 @@ type CourseFiltersProps = {
 export const COURSE_CATALOG_CONTROLS_FORM_ID = "course-catalog-controls";
 
 const inputClasses =
-  "mt-2 min-h-11 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary-focus/20";
+  "mt-2 min-h-10 w-full rounded-md border border-border bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary-focus/20";
 
 const levels = ["BEGINNER", "INTERMEDIATE", "ADVANCE", "ALL_LEVELS"] as const;
 
@@ -55,21 +55,21 @@ export function CourseFilters({ categoryGroups, query }: CourseFiltersProps) {
 
   return (
     <form
-      className="rounded-lg border border-border bg-card p-4"
+      className="rounded-lg border border-border bg-card p-4 shadow-sm"
       id={COURSE_CATALOG_CONTROLS_FORM_ID}
       onSubmit={handleSubmit}
     >
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold">Filters</h2>
         <button
-          className="inline-flex min-h-9 items-center justify-center rounded-pill border border-primary bg-primary px-4 text-sm font-normal text-primary-foreground transition-transform active:scale-95"
+          className="inline-flex min-h-9 items-center justify-center rounded-md border border-primary bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-focus"
           type="submit"
         >
-          Apply filters
+          Apply
         </button>
       </div>
 
-      <div className="mt-5 grid gap-4">
+      <div className="mt-5 grid gap-4 text-foreground">
         <label className="text-sm font-semibold" htmlFor="categoryId">
           Category
           <select

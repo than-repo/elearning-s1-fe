@@ -47,9 +47,9 @@ export default async function CourseDetailPage({
   const enrolledState = getFirstParam(resolvedSearchParams.enrolled);
 
   return (
-    <main className="min-h-screen bg-muted text-foreground">
+    <main className="min-h-screen bg-surface-pearl text-foreground">
       <PublicNavbar brandLabel="E-Learning System" links={navLinks} />
-      <section className="mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
+      <section className="mx-auto w-full max-w-[1440px] px-5 py-8 sm:px-8 lg:px-12 lg:py-10">
         {enrolledState === "success" ? (
           <p className="mb-5 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
             Payment successful. You are now enrolled in this course.

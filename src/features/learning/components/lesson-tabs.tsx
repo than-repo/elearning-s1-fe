@@ -19,10 +19,10 @@ export function LessonTabs({ lesson }: LessonTabsProps) {
   const [activeTab, setActiveTab] = useState<LearningTab>("overview");
 
   return (
-    <section className="mb-20 rounded-lg border-2 border-foreground/80 bg-white shadow-[5px_5px_0_#1d1d1f] lg:mb-0">
+    <section className="mb-20 rounded-lg border border-border bg-card shadow-sm lg:mb-0">
       <div
         aria-label="Lesson details"
-        className="flex gap-2 border-b-2 border-foreground/80 bg-[#fffdf7] p-3"
+        className="flex gap-2 border-b border-border bg-background p-3"
         role="tablist"
       >
         <TabButton
@@ -61,10 +61,10 @@ function TabButton({
     <button
       aria-selected={isActive}
       className={[
-        "min-h-10 rounded-pill border-2 px-4 text-sm font-semibold transition-transform active:translate-x-0.5 active:translate-y-0.5",
+        "min-h-10 rounded-md border px-4 text-sm font-semibold transition-colors",
         isActive
-          ? "border-foreground/80 bg-[#dff6ee] shadow-[2px_2px_0_#1d1d1f]"
-          : "border-foreground/30 bg-white hover:border-foreground/80",
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-border bg-card hover:border-primary hover:text-primary",
       ].join(" ")}
       onClick={onClick}
       role="tab"
@@ -101,7 +101,7 @@ function LessonOverview({ lesson }: { lesson: LearningLesson }) {
 
 function OverviewFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border-2 border-dashed border-foreground/50 bg-[#fffdf7] p-4">
+    <div className="rounded-md border border-border bg-surface-pearl p-4">
       <p className="text-sm font-semibold text-muted-foreground">{label}</p>
       <p className="mt-1 break-words text-xl font-semibold">{value}</p>
     </div>
@@ -111,7 +111,7 @@ function OverviewFact({ label, value }: { label: string; value: string }) {
 function LessonResources({ files }: { files: LearningFile[] }) {
   if (files.length === 0) {
     return (
-      <div className="rounded-md border-2 border-dashed border-foreground/40 bg-[#fffdf7] px-4 py-8 text-center">
+      <div className="rounded-md border border-border bg-surface-pearl px-4 py-8 text-center">
         <h3 className="text-xl font-semibold leading-tight">No resources</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
           No resources have been added for this lesson.
@@ -135,14 +135,14 @@ function LessonResources({ files }: { files: LearningFile[] }) {
 function ResourceCard({ file, index }: { file: LearningFile; index: number }) {
   return (
     <a
-      className="grid grid-cols-[42px_minmax(0,1fr)] gap-3 rounded-md border-2 border-foreground/40 bg-[#fffdf7] p-3 transition-transform hover:border-foreground/80 active:translate-x-0.5 active:translate-y-0.5"
+      className="grid grid-cols-[42px_minmax(0,1fr)] gap-3 rounded-md border border-border bg-background p-3 transition-colors hover:border-primary hover:text-primary"
       href={file.url}
       rel="noreferrer"
       target="_blank"
     >
       <span
         className={[
-          "grid size-10 place-items-center rounded-md border-2 text-sm font-semibold",
+          "grid size-10 place-items-center rounded-md border text-sm font-semibold",
           mediaTypeClasses[file.type],
         ].join(" ")}
       >
