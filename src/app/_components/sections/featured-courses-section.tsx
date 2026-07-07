@@ -13,7 +13,7 @@ export function FeaturedCoursesSection({
   isUnavailable,
 }: FeaturedCoursesSectionProps) {
   return (
-    <section className="bg-muted">
+    <section id="featured-courses" className="scroll-mt-24 bg-muted">
       <div className="mx-auto w-full max-w-[1440px] px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
         <SectionHeader
           action={

@@ -44,7 +44,7 @@ export const heroContent = {
   title: "Learn the skills that move your career forward.",
   description:
     "Explore practical courses, find focused learning paths, and start building real project skills from one clear catalog.",
-  primaryAction: { href: "/courses", label: "Explore courses" },
+  primaryAction: { href: "#featured-courses", label: "Explore courses" },
   secondaryAction: { href: "/register", label: "Create account" },
   searchPlaceholder: "What do you want to learn?",
   image: {

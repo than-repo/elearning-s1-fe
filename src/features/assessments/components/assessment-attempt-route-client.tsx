@@ -48,11 +48,9 @@ export function AssessmentAttemptRouteClient({
 
             <Link
               className="inline-flex min-h-11 items-center justify-center rounded-md border border-border bg-background px-5 text-sm font-semibold transition-colors hover:border-primary hover:text-primary"
-              href={`/courses/${courseSlug}/learn?assessment=${encodeURIComponent(
-                assessmentId,
-              )}`}
+              href={`/courses/${courseSlug}/learn`}
             >
-              Back to assessment
+              Back to course
             </Link>
           </div>
         </section>

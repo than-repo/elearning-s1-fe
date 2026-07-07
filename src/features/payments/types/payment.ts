@@ -59,3 +59,25 @@ export type SimulationPaymentResult = {
   payment: PaymentResponse;
   status: SimulationPaymentStatus;
 };
+
+export interface PaymentHistoryCourse {
+  id: string;
+  title: string;
+  slug: string;
+  thumbnailUrl: string | null;
+}
+
+export interface PaymentHistoryItem {
+  id: string;
+  amount: number;
+  currency: string;
+  paymentMethod: PaymentMethod;
+  status: PaymentStatus;
+  paidAt: string | null;
+  createdAt: string;
+  course: PaymentHistoryCourse;
+}
+
+export interface GetPaymentsResponse {
+  payments: PaymentHistoryItem[];
+}

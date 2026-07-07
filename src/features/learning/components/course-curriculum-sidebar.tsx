@@ -74,6 +74,7 @@ export function CourseCurriculumSidebar({
   activeLessonId,
   assessments = [],
   courseSlug,
+
   onLessonClick,
   sections,
 }: CourseCurriculumSidebarProps) {
@@ -195,7 +196,7 @@ export function CourseCurriculumSidebar({
           >
             <summary className="cursor-pointer list-none">
               <div className="flex items-start gap-3">
-                <span className="grid size-8 shrink-0 place-items-center rounded-md border border-primary/30 bg-primary/10 text-sm font-semibold text-primary">
+                <span className="grid size-8 shrink-0 place-items-center rounded-md border border-border bg-surface-pearl text-sm font-semibold">
                   A
                 </span>
 
@@ -205,14 +206,24 @@ export function CourseCurriculumSidebar({
                   </h3>
 
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {orderedAssessments.length}{" "}
-                    {orderedAssessments.length === 1
-                      ? "assessment"
-                      : "assessments"}
+                    {orderedAssessments.length} assessments
                   </p>
                 </div>
               </div>
             </summary>
+
+            <div className="mt-3">
+              <Link
+                className="flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm font-semibold transition hover:border-primary/50 hover:text-primary"
+                href={`/courses/${courseSlug}/learn?view=assessments`}
+                onClick={onLessonClick}
+              >
+                <span>All assessments</span>
+                <span className="text-xs text-muted-foreground">
+                  {orderedAssessments.length}
+                </span>
+              </Link>
+            </div>
 
             <div className="mt-3 grid gap-2">
               {orderedAssessments.map((assessment, assessmentIndex) => {

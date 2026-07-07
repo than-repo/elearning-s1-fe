@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
+
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
-
-import { LearnerAssessmentEntry } from "@/features/assessments/components/learner-assessment-entry";
-
+import { useMemo, useState } from "react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
-
+import { LearnerAssessmentEntry } from "@/features/assessments/components/learner-assessment-entry";
 import type { CourseLearningResponse } from "../types/learning-course";
 import {
   getLearningTotals,
@@ -29,21 +27,24 @@ export function LearningCoursePage({
   activeLessonId,
   course,
 }: LearningCoursePageProps) {
-  const searchParams = useSearchParams();
   const { accessToken } = useAuth();
 
-  const [isCurriculumOpen, setIsCurriculumOpen] = useState(false);
+  const searchParams = useSearchParams();
 
+  const activeView = searchParams.get("view");
   const activeAssessmentId = searchParams.get("assessment") ?? undefined;
+
+  const isViewingAssessmentList = activeView === "assessments";
   const isViewingAssessment = Boolean(activeAssessmentId);
+
+  const [isCurriculumOpen, setIsCurriculumOpen] = useState(false);
 
   const sections = getOrderedSections(course.sections);
   const totals = getLearningTotals(sections);
 
   const {
     activeBundle,
-    firstBundle,
-    isRequestedLessonMissing,
+
     nextBundle,
     previousBundle,
   } = getLessonSelection(sections, activeLessonId);
@@ -79,13 +80,12 @@ export function LearningCoursePage({
             ) : (
               <AssessmentAuthRequired />
             )
-          ) : isRequestedLessonMissing ? (
-            <LessonNotFound
-              firstLessonHref={
-                firstBundle
-                  ? getLessonHref(course.slug, firstBundle.lesson.id)
-                  : null
-              }
+          ) : isViewingAssessmentList ? (
+            <CourseAssessmentList
+              assessments={assessments}
+              courseSlug={course.slug}
+              error={assessmentsError}
+              isLoading={isAssessmentsLoading}
             />
           ) : activeBundle ? (
             <div className="grid gap-5">
@@ -170,7 +170,6 @@ export function LearningCoursePage({
                 }
                 assessments={assessments}
                 courseSlug={course.slug}
-                onLessonClick={() => setIsCurriculumOpen(false)}
                 sections={sections}
               />
 
@@ -346,4 +345,133 @@ function EmptyCourseState({ courseSlug }: { courseSlug: string }) {
 
 function getLessonHref(courseSlug: string, lessonId: string) {
   return `/courses/${courseSlug}/learn?lesson=${encodeURIComponent(lessonId)}`;
+}
+
+function CourseAssessmentList({
+  assessments,
+  courseSlug,
+  error,
+  isLoading,
+}: {
+  assessments: Array<{
+    id: string;
+    title: string;
+    description?: string | null;
+    type: string;
+    totalPoints: number;
+    passingScore?: number | null;
+    maxAttempts?: number | null;
+    timeLimitMinutes?: number | null;
+  }>;
+  courseSlug: string;
+  error?: string | null;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return (
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <p className="text-sm text-muted-foreground">Loading assessments...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="rounded-2xl border border-danger/20 bg-danger/5 p-6">
+        <p className="text-sm font-semibold text-danger">
+          Unable to load assessments
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+      </section>
+    );
+  }
+
+  if (assessments.length === 0) {
+    return (
+      <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <p className="text-sm font-semibold">No assessments yet</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This course does not have any assessments available.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+          Assessments
+        </p>
+
+        <h2 className="mt-2 text-2xl font-semibold">Course assessments</h2>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Choose an assessment to view details, attempts, history, and start or
+          continue.
+        </p>
+      </div>
+
+      <div className="mt-6 grid gap-4">
+        {assessments.map((assessment) => (
+          <Link
+            className="group rounded-xl border border-border bg-background p-5 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md"
+            href={`/courses/${courseSlug}/learn?assessment=${encodeURIComponent(
+              assessment.id,
+            )}`}
+            key={assessment.id}
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-pill border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+                    {assessment.type === "PROJECT" ? "Project" : "Quiz"}
+                  </span>
+
+                  <span className="rounded-pill border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                    {assessment.totalPoints} pts
+                  </span>
+                </div>
+
+                <h3 className="mt-3 break-words text-lg font-semibold text-foreground group-hover:text-primary">
+                  {assessment.title}
+                </h3>
+
+                {assessment.description ? (
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
+                    {assessment.description}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="grid shrink-0 gap-2 text-sm text-muted-foreground sm:text-right">
+                <span>
+                  Passing:{" "}
+                  <strong className="text-foreground">
+                    {assessment.passingScore ?? "No minimum"}
+                  </strong>
+                </span>
+
+                <span>
+                  Time:{" "}
+                  <strong className="text-foreground">
+                    {assessment.timeLimitMinutes
+                      ? `${assessment.timeLimitMinutes} min`
+                      : "No limit"}
+                  </strong>
+                </span>
+
+                <span>
+                  Attempts:{" "}
+                  <strong className="text-foreground">
+                    {assessment.maxAttempts ?? "Unlimited"}
+                  </strong>
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
 }

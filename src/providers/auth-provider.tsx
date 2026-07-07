@@ -29,8 +29,8 @@ export type AuthContextValue = {
   refresh: () => Promise<boolean>;
   register: (input: RegisterInput) => Promise<void>;
   status: AuthStatus;
-  updateUser: (nextUser: AuthUser | CurrentUser | UserProfile) => void;
-  user: CurrentUser | AuthUser | null;
+  updateUser: (nextUser: Partial<CurrentUser>) => void;
+  user: CurrentUser | null;
 };
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -49,7 +49,7 @@ function isAllowedRole(role: string): role is UserRole {
   return ["LEARNER", "INSTRUCTOR", "REVIEWER", "ADMIN"].includes(role);
 }
 
-function normalizeUser(user: AuthUser | CurrentUser) {
+function normalizeUser(user: CurrentUser): CurrentUser {
   return {
     ...user,
     role: isAllowedRole(user.role) ? user.role : "LEARNER",
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<AuthStatus>("loading");
-  const [user, setUser] = useState<AuthUser | CurrentUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const setAuthenticatedSession = useCallback(
     async (nextAccessToken: string, fallbackUser: AuthUser) => {
@@ -95,12 +95,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     [],
   );
 
-  const updateUser = useCallback(
-    (nextUser: AuthUser | CurrentUser | UserProfile) => {
-      setUser(normalizeUser(nextUser));
-    },
-    [],
-  );
+  const updateUser = useCallback((nextUser: Partial<CurrentUser>) => {
+    setUser((prevUser) => {
+      if (!prevUser) {
+        return prevUser;
+      }
+      return normalizeUser({
+        ...prevUser,
+        ...nextUser,
+      });
+    });
+  }, []);
 
   const refresh = useCallback(async () => {
     try {

@@ -464,7 +464,7 @@ export function AttemptResult({
             onClick={navigateBackToAssessment}
             type="button"
           >
-            Back to assessment
+            Back to course
           </button>
         </div>
       </section>

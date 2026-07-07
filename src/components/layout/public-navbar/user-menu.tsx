@@ -62,55 +62,61 @@ export function UserMenu({ onLogout, user }: UserMenuProps) {
         <span className="hidden max-w-32 truncate sm:inline">{user.name}</span>
       </button>
       {isOpen ? (
-      <div
-        className="absolute right-0 z-10 mt-3 w-64 rounded-lg border border-border bg-card p-2 text-foreground shadow-[0_18px_50px_rgb(0_0_0_/_14%)]"
-        role="menu"
-      >
-        {user.email ? (
-          <div className="border-b border-border px-3 pb-3 pt-2">
-            <p className="truncate text-sm font-semibold">{user.name}</p>
-            <p className="mt-1 truncate text-xs text-muted-foreground">
-              {user.email}
-            </p>
-          </div>
-        ) : null}
-        {user.role === "LEARNER" ? (
+        <div
+          className="absolute right-0 z-10 mt-3 w-64 rounded-lg border border-border bg-card p-2 text-foreground shadow-[0_18px_50px_rgb(0_0_0_/_14%)]"
+          role="menu"
+        >
+          {user.email ? (
+            <div className="border-b border-border px-3 pb-3 pt-2">
+              <p className="truncate text-sm font-semibold">{user.name}</p>
+              <p className="mt-1 truncate text-xs text-muted-foreground">
+                {user.email}
+              </p>
+            </div>
+          ) : null}
+          {user.role === "LEARNER" ? (
+            <Link
+              href="/my-courses"
+              className="mt-2 block rounded-md px-3 py-2 text-sm font-normal hover:bg-muted"
+              onClick={() => setIsOpen(false)}
+              role="menuitem"
+            >
+              My courses
+            </Link>
+          ) : null}
+
+          {user.role === "LEARNER" ? (
+            <Link
+              href="/my-payments"
+              className="mt-2 block rounded-md px-3 py-2 text-sm font-normal hover:bg-muted"
+              onClick={() => setIsOpen(false)}
+              role="menuitem"
+            >
+              My payments
+            </Link>
+          ) : null}
+
           <Link
-            href="/my-courses"
+            href="/settings"
             className="mt-2 block rounded-md px-3 py-2 text-sm font-normal hover:bg-muted"
             onClick={() => setIsOpen(false)}
             role="menuitem"
           >
-            My Courses
+            Settings
           </Link>
-        ) : null}
-        <Link
-          href="/profile"
-          className="block rounded-md px-3 py-2 text-sm font-normal hover:bg-muted"
-          onClick={() => setIsOpen(false)}
-          role="menuitem"
-        >
-          Edit profile
-        </Link>
-        <button
-          type="button"
-          className="block w-full rounded-md px-3 py-2 text-left text-sm font-normal hover:bg-muted"
-          role="menuitem"
-        >
-          Change dark mode
-        </button>
-        <button
-          onClick={() => {
-            setIsOpen(false);
-            void onLogout?.();
-          }}
-          type="button"
-          className="block w-full rounded-md px-3 py-2 text-left text-sm font-normal text-danger hover:bg-muted"
-          role="menuitem"
-        >
-          Logout
-        </button>
-      </div>
+
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              void onLogout?.();
+            }}
+            type="button"
+            className="mt-2 block w-full rounded-md px-3 py-2 text-left text-sm font-normal text-danger hover:bg-muted"
+            role="menuitem"
+          >
+            Logout
+          </button>
+        </div>
       ) : null}
     </div>
   );

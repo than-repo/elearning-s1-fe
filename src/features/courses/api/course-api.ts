@@ -8,6 +8,8 @@ import type {
 } from "../types/course";
 import { buildPublicCourseQueryString } from "../utils/course-data";
 
+const paymentDevHeaders: HeadersInit = { "ngrok-skip-browser-warning": "true" };
+
 export function getPublicCourses(query?: PublicCourseQuery) {
   return apiRequest<PaginatedCourses>(
     `/courses/public${buildPublicCourseQueryString(query)}`,
@@ -23,6 +25,7 @@ export function getPublicCourseBySlug(slug: string) {
     `/courses/public/${encodeURIComponent(slug)}`,
     {
       method: "GET",
+      headers: paymentDevHeaders,
     },
   );
 }

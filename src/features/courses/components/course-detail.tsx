@@ -15,7 +15,8 @@ type CourseDetailProps = {
 
 export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
   const primaryInstructor = course.instructors?.[0]?.fullName;
-  const categoryNames = course.categories?.map((category) => category.name) ?? [];
+  const categoryNames =
+    course.categories?.map((category) => category.name) ?? [];
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
@@ -82,34 +83,114 @@ export function CourseDetail({ course, enrollmentPanel }: CourseDetailProps) {
         </section>
 
         {course.whatYouWillLearn?.length ? (
-          <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
-            <SectionTitle title="What you will learn" />
-            <ul className="mt-4 grid gap-3 text-muted-foreground sm:grid-cols-2">
-              {course.whatYouWillLearn.map((item) => (
-                <li
-                  className="rounded-md border border-border bg-surface-pearl px-4 py-3"
-                  key={item}
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+          <section className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent" />
+
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <svg
+                    className="size-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 6 9 17l-5-5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <div>
+                  <SectionTitle title="What you will learn" />
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Key skills and concepts you will gain from this course.
+                  </p>
+                </div>
+              </div>
+
+              <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                {course.whatYouWillLearn.map((item) => (
+                  <li
+                    className="group flex gap-3 rounded-xl border border-border bg-background/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                    key={item}
+                  >
+                    <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                      <svg
+                        className="size-3.5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M20 6 9 17l-5-5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+
+                    <span className="text-sm font-medium leading-6 text-foreground">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
         ) : null}
 
         {course.requirements?.length ? (
-          <section className="rounded-lg border border-border bg-card p-5 shadow-sm">
-            <SectionTitle title="Requirements" />
-            <ul className="mt-4 grid gap-3 text-muted-foreground">
-              {course.requirements.map((item) => (
-                <li
-                  className="rounded-md border border-border bg-surface-pearl px-4 py-3"
-                  key={item}
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+          <section className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" />
+
+            <div className="relative">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+                  <svg
+                    className="size-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+
+                <div>
+                  <SectionTitle title="Requirements" />
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    What you should prepare before starting this course.
+                  </p>
+                </div>
+              </div>
+
+              <ul className="mt-6 space-y-3">
+                {course.requirements.map((item, index) => (
+                  <li
+                    className="group flex items-start gap-4 rounded-xl border border-border bg-background/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-500/40 hover:shadow-md"
+                    key={item}
+                  >
+                    <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-amber-500/10 text-xs font-semibold text-amber-600 transition group-hover:bg-amber-500 group-hover:text-white">
+                      {index + 1}
+                    </span>
+
+                    <span className="text-sm font-medium leading-6 text-foreground">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
         ) : null}
       </article>
@@ -157,7 +238,10 @@ function CourseFacts({
           value={formatCourseDuration(course.durationInMinutes)}
         />
         <DetailRow label="Level" value={formatCourseLevel(course.level)} />
-        <DetailRow label="Language" value={course.language ?? "Not specified"} />
+        <DetailRow
+          label="Language"
+          value={course.language ?? "Not specified"}
+        />
         <DetailRow
           label="Instructor"
           value={primaryInstructor ?? "Not assigned"}

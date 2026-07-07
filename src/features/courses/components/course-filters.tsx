@@ -6,6 +6,7 @@ import type { FormEvent } from "react";
 import type { PublicCourseQuery } from "../types/course";
 import type { CourseCategoryGroup } from "../utils/course-data";
 import { formatCourseLevel } from "../utils/course-data";
+import { LanguageSearchDropdown } from "./LanguageSearchDropdown";
 
 type CourseFiltersProps = {
   categoryGroups: CourseCategoryGroup[];
@@ -133,17 +134,10 @@ export function CourseFilters({ categoryGroups, query }: CourseFiltersProps) {
           </label>
         </div>
 
-        <label className="text-sm font-semibold" htmlFor="language">
-          Language
-          <input
-            className={inputClasses}
-            defaultValue={query.language ?? ""}
-            id="language"
-            name="language"
-            placeholder="en, vi"
-            type="text"
-          />
-        </label>
+        <LanguageSearchDropdown
+          defaultValue={query.language ?? ""}
+          inputClasses={inputClasses}
+        />
 
         <label className="text-sm font-semibold" htmlFor="certificateEnabled">
           Certificate

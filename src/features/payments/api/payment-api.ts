@@ -6,7 +6,10 @@ import type {
   CreateSimulationPaymentInput,
   SimulationPaymentResult,
   VnpayReturnResult,
+  GetPaymentsResponse,
 } from "../types/payment";
+
+const paymentDevHeaders: HeadersInit = { "ngrok-skip-browser-warning": "true" };
 
 export function createVnpayPaymentUrl(
   input: CreateVnpayPaymentUrlInput,
@@ -18,6 +21,7 @@ export function createVnpayPaymentUrl(
       accessToken,
       body: input,
       method: "POST",
+      headers: paymentDevHeaders,
     },
   );
 }
@@ -29,6 +33,7 @@ export function verifyVnpayReturn(queryString: string) {
     `/payments/vnpay/verify-return${suffix}`,
     {
       method: "GET",
+      headers: paymentDevHeaders,
     },
   );
 }
@@ -43,6 +48,7 @@ export function createSimulationPayment(
       accessToken,
       body: input,
       method: "POST",
+      headers: paymentDevHeaders,
     },
   );
 }
@@ -56,6 +62,7 @@ export function confirmSimulationPayment(
     {
       accessToken,
       method: "POST",
+      headers: paymentDevHeaders,
     },
   );
 }
@@ -66,6 +73,14 @@ export function failSimulationPayment(paymentId: string, accessToken: string) {
     {
       accessToken,
       method: "POST",
+      headers: paymentDevHeaders,
     },
   );
+}
+
+export function getMyPayments(accessToken: string) {
+  return apiRequest<GetPaymentsResponse>(`/payments/me`, {
+    method: "GET",
+    accessToken,
+  });
 }

@@ -22,6 +22,8 @@ import {
   flattenCategoryGroups,
   parsePublicCourseQuery,
 } from "@/features/courses/utils/course-data";
+import { FooterSection } from "../_components/sections/footer-section";
+import { footerContent } from "../_components/home-content";
 
 export const dynamic = "force-dynamic";
 
@@ -79,6 +81,13 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps) {
           )}
         </div>
       </section>
+
+      <FooterSection
+        brand={footerContent.brand}
+        demoNote={footerContent.demoNote}
+        groups={footerContent.groups}
+        notice={footerContent.notice}
+      />
     </main>
   );
 }

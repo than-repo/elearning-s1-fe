@@ -31,40 +31,40 @@ export function LessonHeader({
       <h2 className="mt-4 break-words text-2xl font-semibold leading-tight sm:text-3xl">
         {lesson.title}
       </h2>
+
       <p className="mt-2 break-words text-sm font-semibold text-ink-muted">
         {section.title}
       </p>
+
       {lesson.description ? (
         <p className="mt-3 max-w-3xl whitespace-pre-line break-words text-base leading-7 text-muted-foreground">
           {lesson.description}
         </p>
       ) : null}
 
-      <nav
-        aria-label="Lesson navigation"
-        className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-      >
-        {previousBundle ? (
-          <LessonNavigationLink
-            href={getLessonHref(courseSlug, previousBundle.lesson.id)}
-            label="Previous"
-            title={previousBundle.lesson.title}
-          />
-        ) : (
-          <DisabledNavigation label="Previous" />
-        )}
+      {(previousBundle || nextBundle) && (
+        <nav
+          aria-label="Lesson navigation"
+          className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          {previousBundle && (
+            <LessonNavigationLink
+              href={getLessonHref(courseSlug, previousBundle.lesson.id)}
+              label="Previous"
+              title={previousBundle.lesson.title}
+            />
+          )}
 
-        {nextBundle ? (
-          <LessonNavigationLink
-            align="right"
-            href={getLessonHref(courseSlug, nextBundle.lesson.id)}
-            label="Next"
-            title={nextBundle.lesson.title}
-          />
-        ) : (
-          <DisabledNavigation align="right" label="Next" />
-        )}
-      </nav>
+          {nextBundle && (
+            <LessonNavigationLink
+              align="right"
+              href={getLessonHref(courseSlug, nextBundle.lesson.id)}
+              label="Next"
+              title={nextBundle.lesson.title}
+            />
+          )}
+        </nav>
+      )}
     </section>
   );
 }
@@ -84,33 +84,13 @@ function LessonNavigationLink({
     <Link
       className={[
         "min-h-14 rounded-md border border-border bg-background px-4 py-2 text-sm font-semibold transition-colors hover:border-primary hover:text-primary sm:max-w-[48%]",
-        align === "right" ? "text-left sm:text-right" : "text-left",
+        align === "right" ? "text-left sm:ml-auto sm:text-right" : "text-left",
       ].join(" ")}
       href={href}
     >
       <span className="block text-xs uppercase text-ink-muted">{label}</span>
       <span className="mt-1 block truncate">{title}</span>
     </Link>
-  );
-}
-
-function DisabledNavigation({
-  align = "left",
-  label,
-}: {
-  align?: "left" | "right";
-  label: string;
-}) {
-  return (
-    <span
-      className={[
-        "min-h-14 rounded-md border border-border bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground sm:max-w-[48%]",
-        align === "right" ? "text-left sm:text-right" : "text-left",
-      ].join(" ")}
-    >
-      <span className="block text-xs uppercase">{label}</span>
-      <span className="mt-1 block">Unavailable</span>
-    </span>
   );
 }
 

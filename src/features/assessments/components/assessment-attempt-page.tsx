@@ -465,7 +465,7 @@ function AttemptSidebar({
   answeredCount,
   isSaving,
   isSubmitting,
-  onSaveAll,
+
   onSubmit,
   remainingSeconds,
   totalQuestions,
@@ -474,7 +474,7 @@ function AttemptSidebar({
   answeredCount: number;
   isSaving: boolean;
   isSubmitting: boolean;
-  onSaveAll: () => Promise<boolean>;
+
   onSubmit: () => Promise<void>;
   remainingSeconds: number | null;
   totalQuestions: number;
@@ -540,15 +540,6 @@ function AttemptSidebar({
       {isQuiz ? (
         <div className="mt-5 space-y-3">
           <button
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-border bg-background px-5 text-sm font-semibold transition hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isSaving || isSubmitting}
-            onClick={() => void onSaveAll()}
-            type="button"
-          >
-            {isSaving ? "Saving..." : "Save all answers"}
-          </button>
-
-          <button
             className="inline-flex min-h-11 w-full items-center justify-center rounded-pill border border-primary bg-primary px-5 text-sm font-semibold text-primary-foreground transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
             disabled={isSaving || isSubmitting}
             onClick={() => void onSubmit()}
@@ -600,9 +591,18 @@ export function AssessmentAttemptPage({
     courseId,
   });
 
+  const ANSWER_AUTOSAVE_DELAY_MS = 600;
+  const TIMER_FINALIZE_THRESHOLD_SECONDS = 5;
+
+  const [isFinalizingByTimer, setIsFinalizingByTimer] = useState(false);
+
   const [pageError, setPageError] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const autoSubmittedRef = useRef(false);
+
+  const answersRef = useRef<Record<string, string>>({});
+  const activeAttemptRef = useRef<ActiveAttempt | null>(null);
+  const autosaveTimeoutsRef = useRef<Record<string, number>>({});
 
   const isQuiz = activeAttempt?.type === "QUIZ";
   const isProject = activeAttempt?.type === "PROJECT";
@@ -613,6 +613,22 @@ export function AssessmentAttemptPage({
         firstQuestion.order - secondQuestion.order,
     );
   }, [activeAttempt]);
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    activeAttemptRef.current = activeAttempt;
+  }, [activeAttempt]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(autosaveTimeoutsRef.current).forEach((timeoutId) => {
+        window.clearTimeout(timeoutId);
+      });
+    };
+  }, []);
 
   function navigateToResult(targetAttemptId = attemptId) {
     router.push(
@@ -628,34 +644,95 @@ export function AssessmentAttemptPage({
     );
   }
 
-  async function handleSaveAll(options?: { requireAnswered?: boolean }) {
-    if (!activeAttempt) {
+  function scheduleAutosaveAnswer(questionId: string, answer: string) {
+    if (autosaveTimeoutsRef.current[questionId]) {
+      window.clearTimeout(autosaveTimeoutsRef.current[questionId]);
+    }
+
+    autosaveTimeoutsRef.current[questionId] = window.setTimeout(() => {
+      if (!answer.trim()) {
+        return;
+      }
+
+      void saveAnswer(questionId, answer);
+    }, ANSWER_AUTOSAVE_DELAY_MS);
+  }
+
+  function handleAnswerChange(questionId: string, answer: string) {
+    answersRef.current = {
+      ...answersRef.current,
+      [questionId]: answer,
+    };
+
+    setAnswer(questionId, answer);
+    scheduleAutosaveAnswer(questionId, answer);
+  }
+
+  async function flushAutosaves() {
+    Object.values(autosaveTimeoutsRef.current).forEach((timeoutId) => {
+      window.clearTimeout(timeoutId);
+    });
+
+    autosaveTimeoutsRef.current = {};
+  }
+
+  async function handleSaveAll(options?: {
+    requireAnswered?: boolean;
+    showError?: boolean;
+  }) {
+    const currentAttempt = activeAttemptRef.current;
+
+    if (!currentAttempt) {
       return false;
     }
 
     const requireAnswered = options?.requireAnswered ?? true;
+    const showError = options?.showError ?? true;
+    const latestAnswers = answersRef.current;
 
-    setPageError(null);
+    if (showError) {
+      setPageError(null);
+    }
 
-    const answeredQuestions = activeAttempt.questions.filter((question) =>
-      answers[question.questionId]?.trim(),
+    await flushAutosaves();
+
+    const answeredQuestions = currentAttempt.questions.filter((question) =>
+      latestAnswers[question.questionId]?.trim(),
     );
 
     if (requireAnswered && answeredQuestions.length === 0) {
-      setPageError("Please answer at least one question before saving.");
+      if (showError) {
+        setPageError("Please answer at least one question before saving.");
+      }
+
       return false;
     }
 
-    await Promise.all(
+    const saveResults = await Promise.all(
       answeredQuestions.map((question) =>
-        saveAnswer(question.questionId, answers[question.questionId]),
+        saveAnswer(question.questionId, latestAnswers[question.questionId]),
       ),
     );
+
+    const hasFailedSave = saveResults.some((result) => result === null);
+
+    if (hasFailedSave) {
+      if (showError) {
+        setPageError(
+          "Some answers could not be saved. Please check your connection and try again.",
+        );
+      }
+
+      return false;
+    }
 
     return true;
   }
 
-  async function handleSubmit(options?: { skipConfirm?: boolean }) {
+  async function handleSubmit(options?: {
+    skipConfirm?: boolean;
+    triggeredByTimer?: boolean;
+  }) {
     if (!activeAttempt) {
       return;
     }
@@ -678,14 +755,35 @@ export function AssessmentAttemptPage({
       }
     }
 
+    if (options?.triggeredByTimer) {
+      setIsFinalizingByTimer(true);
+    }
+
     try {
-      await handleSaveAll({ requireAnswered: false });
+      const didSaveAnswers = await handleSaveAll({
+        requireAnswered: false,
+        showError: !options?.triggeredByTimer,
+      });
+
+      if (!didSaveAnswers) {
+        setPageError(
+          options?.triggeredByTimer
+            ? "Saving your answers and submitting your quiz..."
+            : "Some answers could not be saved. Please try again.",
+        );
+
+        return;
+      }
 
       const result = await submit();
 
       navigateToResult(result.attemptId);
     } catch (error) {
       setPageError(getErrorMessage(error, "Unable to submit attempt."));
+    } finally {
+      if (options?.triggeredByTimer) {
+        setIsFinalizingByTimer(false);
+      }
     }
   }
 
@@ -736,22 +834,55 @@ export function AssessmentAttemptPage({
     return () => window.clearInterval(intervalId);
   }, [remainingSeconds]);
 
-  useEffect(() => {
-    if (
-      remainingSeconds !== 0 ||
-      !activeAttempt ||
-      activeAttempt.type !== "QUIZ" ||
-      autoSubmittedRef.current ||
-      isSubmitting
-    ) {
+  async function finalizeAttemptByTimer() {
+    if (!activeAttemptRef.current || autoSubmittedRef.current) {
       return;
     }
 
     autoSubmittedRef.current = true;
-    void handleSubmit({ skipConfirm: true });
+    setIsFinalizingByTimer(true);
+    setPageError(null);
+
+    try {
+      const didSaveAnswers = await handleSaveAll({
+        requireAnswered: false,
+        showError: false,
+      });
+
+      if (!didSaveAnswers) {
+        setPageError(
+          "Time is almost up. Some answers could not be saved before submission.",
+        );
+        return;
+      }
+
+      const result = await submit();
+
+      navigateToResult(result.attemptId);
+    } catch (error) {
+      setPageError(getErrorMessage(error, "Unable to submit attempt."));
+    } finally {
+      setIsFinalizingByTimer(false);
+    }
+  }
+
+  useEffect(() => {
+    if (
+      remainingSeconds === null ||
+      remainingSeconds > TIMER_FINALIZE_THRESHOLD_SECONDS ||
+      !activeAttempt ||
+      activeAttempt.type !== "QUIZ" ||
+      autoSubmittedRef.current ||
+      isSubmitting ||
+      isFinalizingByTimer
+    ) {
+      return;
+    }
+
+    void finalizeAttemptByTimer();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [remainingSeconds, activeAttempt, isSubmitting]);
+  }, [remainingSeconds, activeAttempt, isSubmitting, isFinalizingByTimer]);
 
   if (isLoading) {
     return <AttemptPageSkeleton />;
@@ -798,6 +929,7 @@ export function AssessmentAttemptPage({
     activeAttempt.status !== "IN_PROGRESS" ||
     isSubmitting ||
     isSubmittingProject ||
+    isFinalizingByTimer ||
     remainingSeconds === 0;
 
   return (
@@ -839,9 +971,13 @@ export function AssessmentAttemptPage({
           </p>
         ) : null}
 
-        {remainingSeconds === 0 ? (
+        {isFinalizingByTimer ? (
           <p className="mt-5 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
-            Time is up. Your quiz is being submitted.
+            Time is up. Saving your answers and submitting your quiz...
+          </p>
+        ) : remainingSeconds === 0 ? (
+          <p className="mt-5 rounded-xl border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
+            Time is up. Your quiz is being finalized.
           </p>
         ) : null}
       </div>
@@ -857,7 +993,7 @@ export function AssessmentAttemptPage({
                   isSaving={savingQuestionIds[question.questionId]}
                   key={question.questionId}
                   onAnswerChange={(answer) =>
-                    setAnswer(question.questionId, answer)
+                    handleAnswerChange(question.questionId, answer)
                   }
                   onSave={() =>
                     void saveAnswer(
@@ -891,7 +1027,6 @@ export function AssessmentAttemptPage({
           answeredCount={answeredCount}
           isSaving={isSaving}
           isSubmitting={isSubmitting}
-          onSaveAll={() => handleSaveAll()}
           onSubmit={() => handleSubmit()}
           remainingSeconds={remainingSeconds}
           totalQuestions={totalQuestions}

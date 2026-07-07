@@ -96,17 +96,11 @@ function getStateLabel(assessment: LearnerAssessment) {
 }
 
 function getPrimaryButtonLabel(assessment: LearnerAssessment) {
-  switch (assessment.primaryAction) {
-    case "START":
-      return assessment.type === "PROJECT" ? "Start project" : "Start quiz";
-    case "CONTINUE":
-      return "Continue attempt";
-    case "VIEW_RESULT":
-      return "View result Or Start quiz ";
-    case "NONE":
-    default:
-      return "Unavailable";
+  if (assessment.primaryAction === "CONTINUE") {
+    return "Continue attempt";
   }
+
+  return assessment.type === "PROJECT" ? "Start project" : "Start quiz";
 }
 
 function getStateBadgeClasses(assessment: LearnerAssessment) {
@@ -139,6 +133,17 @@ function getAttemptStatusClasses(status: AssessmentAttemptStatus | string) {
     default:
       return "border-border bg-muted text-muted-foreground";
   }
+}
+
+function isFinishedAttemptStatus(
+  status?: AssessmentAttemptStatus | string | null,
+) {
+  return (
+    status === "SUBMITTED" ||
+    status === "GRADED" ||
+    status === "PASSED" ||
+    status === "FAILED"
+  );
 }
 
 function AssessmentEntrySkeleton() {
@@ -307,16 +312,6 @@ export function LearnerAssessmentEntry({
     setActionError(null);
 
     try {
-      if (assessment.primaryAction === "VIEW_RESULT") {
-        if (!latestAttemptId) {
-          setActionError("No completed attempt result was found.");
-          return;
-        }
-
-        navigateToResult(latestAttemptId);
-        return;
-      }
-
       const response = await startOrResume();
       navigateToAttempt(response.attemptId);
     } catch (error) {
@@ -357,6 +352,9 @@ export function LearnerAssessmentEntry({
 
   const visibleError = actionError;
   const attempts = history?.attempts ?? [];
+  const latestAttemptFinished = isFinishedAttemptStatus(
+    assessment.latestAttempt?.status,
+  );
 
   return (
     <section
@@ -409,7 +407,7 @@ export function LearnerAssessmentEntry({
               {isStarting ? "Opening..." : getPrimaryButtonLabel(assessment)}
             </button>
 
-            {latestAttemptId && assessment.primaryAction !== "VIEW_RESULT" ? (
+            {latestAttemptId && latestAttemptFinished ? (
               <button
                 className="inline-flex min-h-11 items-center justify-center rounded-pill border border-border bg-background px-6 text-sm font-semibold transition hover:border-primary hover:text-primary"
                 onClick={() => navigateToResult(latestAttemptId)}

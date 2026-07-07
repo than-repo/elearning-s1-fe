@@ -6,6 +6,8 @@ import { CourseDetail } from "@/features/courses/components/course-detail";
 import { getPublicCourseBySlug } from "@/features/courses/api/course-api";
 import { EnrollmentCta } from "@/features/enrollments/components/enrollment-cta";
 import { ApiError } from "@/lib/api/client";
+import { FooterSection } from "@/app/_components/sections/footer-section";
+import { footerContent } from "@/app/_components/home-content";
 
 type CourseDetailPageProps = {
   params: Promise<{
@@ -65,6 +67,12 @@ export default async function CourseDetailPage({
           enrollmentPanel={<EnrollmentCta course={course} />}
         />
       </section>
+      <FooterSection
+        brand={footerContent.brand}
+        demoNote={footerContent.demoNote}
+        groups={footerContent.groups}
+        notice={footerContent.notice}
+      />
     </main>
   );
 }

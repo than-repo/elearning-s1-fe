@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
@@ -13,7 +12,16 @@ import type {
 } from "../types/profile";
 
 const inputClasses =
-  "mt-2 min-h-11 w-full rounded-md border border-border bg-background px-4 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary-focus/20";
+  "mt-2 h-12 w-full rounded-xl border border-[#d9d9d9] bg-white px-4 text-base text-[#1f1f1f] outline-none transition focus:border-[#0056d2] focus:ring-2 focus:ring-[#0056d2]/10";
+
+const sectionClasses =
+  "rounded-3xl border border-[#d9d9d9] bg-white p-6 shadow-sm";
+
+const primaryButtonClasses =
+  "inline-flex h-12 items-center justify-center rounded-xl bg-[#9fb1cf] px-6 text-base font-semibold text-white transition hover:bg-[#879cbd] disabled:cursor-not-allowed disabled:opacity-60";
+
+const secondaryButtonClasses =
+  "inline-flex h-10 items-center justify-center rounded-xl border border-[#d9d9d9] bg-white px-4 text-sm font-semibold text-[#111827] transition hover:bg-[#f7f7f7]";
 
 const genderOptions: Array<{ label: string; value: ProfileGender }> = [
   { label: "Male", value: "MALE" },
@@ -40,6 +48,7 @@ const emptyFormState: ProfileFormState = {
 
 export function EditProfileForm() {
   const { accessToken, status, updateUser, user } = useAuth();
+
   const [form, setForm] = useState<ProfileFormState>(emptyFormState);
   const [formError, setFormError] = useState<string | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
@@ -58,12 +67,6 @@ export function EditProfileForm() {
     let isMounted = true;
 
     async function loadProfile() {
-      await Promise.resolve();
-
-      if (!isMounted) {
-        return;
-      }
-
       setIsLoadingProfile(true);
       setLoadError(null);
 
@@ -100,6 +103,20 @@ export function EditProfileForm() {
     };
   }, [accessToken, retryCount, status]);
 
+  useEffect(() => {
+    if (!successMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSuccessMessage(null);
+    }, 3500);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [successMessage]);
+
   function updateField<Field extends keyof ProfileFormState>(
     field: Field,
     value: ProfileFormState[Field],
@@ -108,6 +125,7 @@ export function EditProfileForm() {
       ...currentForm,
       [field]: value,
     }));
+
     setFormError(null);
     setSuccessMessage(null);
   }
@@ -136,10 +154,11 @@ export function EditProfileForm() {
         accessToken,
         toUpdateProfileInput(form),
       );
+
       setProfile(updatedProfile);
       setForm(toFormState(updatedProfile));
       updateUser(updatedProfile);
-      setSuccessMessage("Profile updated successfully.");
+      setSuccessMessage("Your profile has been updated successfully.");
     } catch (error) {
       setFormError(
         error instanceof Error
@@ -153,7 +172,7 @@ export function EditProfileForm() {
 
   if (isLoadingProfile) {
     return (
-      <div className="rounded-lg border border-border bg-card px-5 py-14 text-center text-muted-foreground">
+      <div className="rounded-3xl border border-[#d9d9d9] bg-white px-5 py-14 text-center text-sm text-[#5b6780]">
         Loading your profile...
       </div>
     );
@@ -161,13 +180,16 @@ export function EditProfileForm() {
 
   if (loadError) {
     return (
-      <div className="rounded-lg border border-border bg-card px-5 py-14 text-center">
-        <p className="text-lg font-semibold">Profile could not be loaded</p>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+      <div className="rounded-3xl border border-[#d9d9d9] bg-white px-5 py-14 text-center">
+        <p className="text-lg font-semibold text-[#111827]">
+          Profile could not be loaded
+        </p>
+        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#5b6780]">
           {loadError}
         </p>
+
         <button
-          className="mt-5 inline-flex min-h-10 items-center justify-center rounded-pill border border-primary bg-primary px-5 text-sm font-normal text-primary-foreground transition-transform active:scale-95"
+          className="mt-5 inline-flex h-11 items-center justify-center rounded-xl bg-[#0056d2] px-5 text-sm font-semibold text-white transition hover:bg-[#00419e]"
           onClick={() => setRetryCount((currentCount) => currentCount + 1)}
           type="button"
         >
@@ -176,190 +198,278 @@ export function EditProfileForm() {
       </div>
     );
   }
-
   const displayProfile = profile ?? user;
   const displayName =
     form.fullName.trim() || displayProfile?.fullName || "User";
 
+  const avatarSrc = form.avatarUrl.trim();
+
   return (
-    <div className="grid gap-5 lg:grid-cols-[minmax(0,0.72fr)_minmax(280px,0.28fr)]">
-      <form
-        className="rounded-lg border border-border bg-card p-5 sm:p-6"
-        onSubmit={handleSubmit}
-      >
-        <div>
-          <p className="text-sm font-semibold text-primary">Account profile</p>
-          <h2 className="mt-2 text-3xl font-semibold leading-tight">
-            Edit profile
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Keep your public learning identity current. Email, password, and
-            role changes are handled outside this profile form.
-          </p>
-        </div>
+    <>
+      {successMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed right-6 top-6 z-50 w-[calc(100%-3rem)] max-w-sm rounded-2xl border border-emerald-200 bg-white px-4 py-3 shadow-lg"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-emerald-700">
+                Changes saved
+              </p>
+              <p className="mt-1 text-sm text-slate-600">{successMessage}</p>
+            </div>
 
-        <div className="mt-7 grid gap-5 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className="text-sm font-semibold" htmlFor="fullName">
-              Full name
-            </label>
-            <input
-              autoComplete="name"
-              className={inputClasses}
-              id="fullName"
-              maxLength={100}
-              minLength={2}
-              name="fullName"
-              onChange={(event) => updateField("fullName", event.target.value)}
-              required
-              type="text"
-              value={form.fullName}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold" htmlFor="phoneNumber">
-              Phone number
-            </label>
-            <input
-              autoComplete="tel"
-              className={inputClasses}
-              id="phoneNumber"
-              name="phoneNumber"
-              onChange={(event) =>
-                updateField("phoneNumber", event.target.value)
-              }
-              type="tel"
-              value={form.phoneNumber}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold" htmlFor="dateOfBirth">
-              Date of birth
-            </label>
-            <input
-              className={inputClasses}
-              id="dateOfBirth"
-              name="dateOfBirth"
-              onChange={(event) =>
-                updateField("dateOfBirth", event.target.value)
-              }
-              type="date"
-              value={form.dateOfBirth}
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold" htmlFor="gender">
-              Gender
-            </label>
-            <select
-              className={inputClasses}
-              id="gender"
-              name="gender"
-              onChange={(event) =>
-                updateField(
-                  "gender",
-                  event.target.value as ProfileFormState["gender"],
-                )
-              }
-              value={form.gender}
+            <button
+              type="button"
+              aria-label="Dismiss notification"
+              className="text-sm font-semibold text-slate-500 hover:text-slate-900"
+              onClick={() => setSuccessMessage(null)}
             >
-              <option value="">Not specified</option>
-              {genderOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-sm font-semibold" htmlFor="avatarUrl">
-              Avatar URL
-            </label>
-            <input
-              autoComplete="url"
-              className={inputClasses}
-              id="avatarUrl"
-              name="avatarUrl"
-              onChange={(event) => updateField("avatarUrl", event.target.value)}
-              placeholder="https://example.com/avatar.jpg"
-              type="url"
-              value={form.avatarUrl}
-            />
+              ×
+            </button>
           </div>
         </div>
+      ) : null}
 
-        {formError ? (
-          <p className="mt-6 rounded-md border border-danger/20 bg-danger/5 px-4 py-3 text-sm text-danger">
-            {formError}
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <section className={sectionClasses}>
+          <h2 className="text-xl font-semibold text-[#1f1f1f]">
+            Personal information
+          </h2>
+          <p className="mt-1 text-sm text-[#344563]">
+            Update your personal details and how others see you.
           </p>
-        ) : null}
 
-        {successMessage ? (
-          <p className="mt-6 rounded-md border border-success/20 bg-success/5 px-4 py-3 text-sm text-success">
-            {successMessage}
-          </p>
-        ) : null}
+          <div className="mt-8 grid gap-x-5 gap-y-6 md:grid-cols-2">
+            <div>
+              <label
+                className="text-sm font-semibold text-[#111827]"
+                htmlFor="fullName"
+              >
+                Full name
+              </label>
+              <input
+                autoComplete="name"
+                className={inputClasses}
+                id="fullName"
+                maxLength={100}
+                minLength={2}
+                name="fullName"
+                onChange={(event) =>
+                  updateField("fullName", event.target.value)
+                }
+                required
+                type="text"
+                value={form.fullName}
+              />
+            </div>
 
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <button
-            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-primary bg-primary px-6 text-base font-normal text-primary-foreground transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            {isSubmitting ? "Saving..." : "Save changes"}
-          </button>
-          <Link
-            className="inline-flex min-h-11 items-center justify-center rounded-pill border border-border px-6 text-base font-normal text-foreground transition-colors hover:bg-muted"
-            href="/courses"
-          >
-            Cancel
-          </Link>
-        </div>
-      </form>
+            <div>
+              <label
+                className="text-sm font-semibold text-[#111827]"
+                htmlFor="phoneNumber"
+              >
+                Phone number
+              </label>
+              <input
+                autoComplete="tel"
+                className={inputClasses}
+                id="phoneNumber"
+                name="phoneNumber"
+                onChange={(event) =>
+                  updateField("phoneNumber", event.target.value)
+                }
+                placeholder="Not added"
+                type="tel"
+                value={form.phoneNumber}
+              />
+            </div>
 
-      <aside className="rounded-lg border border-border bg-card p-5 sm:p-6">
-        <div className="flex items-center gap-4">
-          <div className="grid size-14 shrink-0 place-items-center rounded-pill bg-primary/10 text-xl font-semibold text-primary">
-            {getInitial(displayName)}
+            <div>
+              <label
+                className="text-sm font-semibold text-[#111827]"
+                htmlFor="dateOfBirth"
+              >
+                Date of birth
+              </label>
+              <input
+                className={inputClasses}
+                id="dateOfBirth"
+                name="dateOfBirth"
+                onChange={(event) =>
+                  updateField("dateOfBirth", event.target.value)
+                }
+                type="date"
+                value={form.dateOfBirth}
+              />
+            </div>
+
+            <div>
+              <label
+                className="text-sm font-semibold text-[#111827]"
+                htmlFor="gender"
+              >
+                Gender
+              </label>
+              <select
+                className={inputClasses}
+                id="gender"
+                name="gender"
+                onChange={(event) =>
+                  updateField(
+                    "gender",
+                    event.target.value as ProfileFormState["gender"],
+                  )
+                }
+                value={form.gender}
+              >
+                <option value="">Not specified</option>
+                {genderOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-lg font-semibold">{displayName}</p>
-            <p className="truncate text-sm text-muted-foreground">
-              {displayProfile?.email ?? "Signed-in account"}
+
+          {formError ? (
+            <p
+              role="alert"
+              className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+            >
+              {formError}
             </p>
-          </div>
-        </div>
+          ) : null}
 
-        <dl className="mt-6 grid gap-4 text-sm">
-          <ProfileFact label="Role" value={formatRole(displayProfile?.role)} />
-          <ProfileFact
-            label="Email status"
-            value={profile?.emailVerified ? "Verified" : "Not verified yet"}
-          />
-          <ProfileFact
-            label="Last sign in"
-            value={formatNullableDate(profile?.lastLoginAt)}
-          />
-        </dl>
-      </aside>
-    </div>
+          <div className="mt-6">
+            <button
+              className={primaryButtonClasses}
+              disabled={isSubmitting}
+              type="submit"
+            >
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </button>
+          </div>
+        </section>
+
+        <section className={sectionClasses}>
+          <h2 className="text-xl font-semibold text-[#1f1f1f]">
+            Profile photo
+          </h2>
+
+          <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-start">
+            {avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt={`${displayName} profile photo`}
+                className="h-16 w-16 shrink-0 rounded-full border border-[#d9d9d9] object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="grid h-16 w-16 shrink-0 place-items-center rounded-full border border-[#d9d9d9] bg-[#eaf2ff] text-xl font-semibold text-[#0056d2]">
+                {getInitial(displayName)}
+              </div>
+            )}
+
+            <div className="flex-1">
+              <p className="text-sm text-[#344563]">
+                Add a profile photo using an image URL. Supported formats depend
+                on the image provider.
+              </p>
+
+              <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+                <div>
+                  <label
+                    className="text-sm font-semibold text-[#111827]"
+                    htmlFor="avatarUrl"
+                  >
+                    Avatar URL
+                  </label>
+                  <input
+                    autoComplete="url"
+                    className={inputClasses}
+                    id="avatarUrl"
+                    name="avatarUrl"
+                    onChange={(event) =>
+                      updateField("avatarUrl", event.target.value)
+                    }
+                    placeholder="https://example.com/avatar.jpg"
+                    type="url"
+                    value={form.avatarUrl}
+                  />
+                </div>
+
+                <button
+                  className={secondaryButtonClasses}
+                  onClick={() => updateField("avatarUrl", "")}
+                  type="button"
+                >
+                  Remove photo
+                </button>
+              </div>
+
+              <div className="mt-6">
+                <button
+                  className={primaryButtonClasses}
+                  disabled={isSubmitting}
+                  type="submit"
+                >
+                  {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={sectionClasses}>
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#1f1f1f]">
+                Account information
+              </h2>
+              <p className="mt-1 text-sm text-[#344563]">
+                These details are used to secure and identify your account.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:min-w-[340px]">
+              <InfoItem
+                label="Email address"
+                value={displayProfile?.email ?? "Not available"}
+              />
+              <InfoItem
+                label="Role"
+                value={formatRole(
+                  displayProfile && "role" in displayProfile
+                    ? String(displayProfile.role)
+                    : undefined,
+                )}
+              />
+              <InfoItem
+                label="Email verified"
+                value={profile?.emailVerified ? "Yes" : "No"}
+              />
+              <InfoItem
+                label="Last login"
+                value={formatNullableDate(profile?.lastLoginAt)}
+              />
+            </div>
+          </div>
+        </section>
+      </form>
+    </>
   );
 }
 
-type ProfileFactProps = {
-  label: string;
-  value: string;
-};
-
-function ProfileFact({ label, value }: ProfileFactProps) {
+function InfoItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-border bg-surface-pearl px-4 py-3">
-      <dt className="font-semibold text-ink-muted">{label}</dt>
-      <dd className="mt-1 text-muted-foreground">{value}</dd>
+    <div className="flex items-center justify-between gap-4 border-b border-[#e6e6e6] pb-3 last:border-b-0 last:pb-0">
+      <p className="text-sm font-semibold text-[#344563]">{label}</p>
+      <p className="max-w-[190px] truncate text-right text-sm font-semibold text-[#1f1f1f]">
+        {value}
+      </p>
     </div>
   );
 }
@@ -376,11 +486,11 @@ function toFormState(profile: UserProfile): ProfileFormState {
 
 function toUpdateProfileInput(form: ProfileFormState): UpdateProfileInput {
   return {
-    avatarUrl: form.avatarUrl,
+    avatarUrl: form.avatarUrl.trim(),
     dateOfBirth: form.dateOfBirth,
-    fullName: form.fullName,
+    fullName: form.fullName.trim(),
     gender: form.gender || null,
-    phoneNumber: form.phoneNumber,
+    phoneNumber: form.phoneNumber.trim(),
   };
 }
 

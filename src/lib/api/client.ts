@@ -54,11 +54,14 @@ export async function apiRequest<T>(
     accessToken,
     body,
     headers: requestHeaders,
+
     signal: requestSignal,
     timeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
     ...fetchOptions
   } = options;
   const headers = new Headers(requestHeaders);
+  headers.set("ngrok-skip-browser-warning", "true");
+
   const controller = new AbortController();
   let didTimeout = false;
   const timeoutId =
