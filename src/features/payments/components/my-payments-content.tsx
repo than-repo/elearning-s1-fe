@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import type { PaginationMeta } from "@/features/courses/types/course";
 import { ApiError } from "@/lib/api/client";
 
 import { getMyPayments } from "../api/payment-api";
-import type { PaymentHistoryItem } from "../types/payment";
+import type { GetPaymentsResponse, PaymentHistoryItem } from "../types/payment";
 
 type PaymentStatusFilter = "ALL" | PaymentHistoryItem["status"];
 type PaymentMethodFilter = "ALL" | PaymentHistoryItem["paymentMethod"];
@@ -54,6 +55,7 @@ const paymentSortOptions: Array<{
 ];
 
 const defaultSortOption: PaymentSortOption = "CREATED_DESC";
+const MY_PAYMENTS_PAGE_SIZE = 10;
 
 function formatCurrency(amount: number, currency: string) {
   return new Intl.NumberFormat("vi-VN", {
@@ -181,13 +183,40 @@ function comparePayments(
   }
 }
 
+function normalizePaymentsResponse(
+  response: GetPaymentsResponse,
+  query: { limit: number; page: number },
+): GetPaymentsResponse {
+  if (Array.isArray(response.data)) {
+    return response;
+  }
+
+  const legacyPayments = (response as unknown as {
+    payments?: PaymentHistoryItem[];
+  }).payments;
+  const data = Array.isArray(legacyPayments) ? legacyPayments : [];
+
+  return {
+    data,
+    meta: {
+      hasNextPage: false,
+      hasPreviousPage: query.page > 1,
+      limit: query.limit,
+      page: query.page,
+      total: data.length,
+      totalPages: data.length > 0 ? 1 : 0,
+    },
+  };
+}
+
 export function MyPaymentsContent() {
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { accessToken, status } = useAuth();
-  const [payments, setPayments] = useState<PaymentHistoryItem[]>([]);
+  const [result, setResult] = useState<GetPaymentsResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [requestedQuery, setRequestedQuery] = useState<string | null>(null);
   const [methodFilter, setMethodFilter] =
     useState<PaymentMethodFilter>("ALL");
   const [searchTerm, setSearchTerm] = useState("");
@@ -196,7 +225,14 @@ export function MyPaymentsContent() {
   const [statusFilter, setStatusFilter] =
     useState<PaymentStatusFilter>("ALL");
 
-  const isLoading = status !== "authenticated" || !hasLoaded;
+  const query = useMemo(
+    () => parseMyPaymentsQuery(searchParams),
+    [searchParams],
+  );
+
+  const queryKey = `${query.page}:${query.limit}`;
+  const payments = result?.data ?? [];
+  const isLoading = status !== "authenticated" || requestedQuery !== queryKey;
 
   const filteredPayments = useMemo(() => {
     const keyword = normalizeSearch(searchTerm);
@@ -234,16 +270,15 @@ export function MyPaymentsContent() {
 
     let isMounted = true;
 
-    setHasLoaded(false);
     setErrorMessage(null);
 
-    getMyPayments(accessToken)
+    getMyPayments(query, accessToken)
       .then((response) => {
         if (!isMounted) {
           return;
         }
 
-        setPayments(Array.isArray(response.payments) ? response.payments : []);
+        setResult(normalizePaymentsResponse(response, query));
       })
       .catch((error) => {
         if (!isMounted) {
@@ -261,14 +296,14 @@ export function MyPaymentsContent() {
       })
       .finally(() => {
         if (isMounted) {
-          setHasLoaded(true);
+          setRequestedQuery(queryKey);
         }
       });
 
     return () => {
       isMounted = false;
     };
-  }, [accessToken, pathname, router, status]);
+  }, [accessToken, pathname, query, queryKey, router, status]);
 
   if (isLoading) {
     return (
@@ -286,7 +321,7 @@ export function MyPaymentsContent() {
     );
   }
 
-  if (payments.length === 0) {
+  if (!result || payments.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center">
         <h2 className="text-base font-semibold text-gray-950">
@@ -384,7 +419,7 @@ export function MyPaymentsContent() {
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-gray-600">
           {filteredPayments.length} of {payments.length} payment
-          {payments.length > 1 ? "s" : ""} shown
+          {payments.length > 1 ? "s" : ""} shown on this page
         </p>
 
         <Link
@@ -546,6 +581,125 @@ export function MyPaymentsContent() {
       </div>
         </>
       )}
+
+      {result.meta ? <MyPaymentsPagination meta={result.meta} /> : null}
     </div>
   );
+}
+
+function parseMyPaymentsQuery(searchParams: URLSearchParams) {
+  return {
+    limit: MY_PAYMENTS_PAGE_SIZE,
+    page: clampNumber(searchParams.get("page"), 1, 1),
+  };
+}
+
+function clampNumber(
+  value: string | null,
+  fallback: number,
+  min: number,
+  max = Number.MAX_SAFE_INTEGER,
+) {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed)) {
+    return fallback;
+  }
+
+  return Math.min(Math.max(Math.trunc(parsed), min), max);
+}
+
+function MyPaymentsPagination({ meta }: { meta: PaginationMeta }) {
+  const pages = getVisiblePages(meta.page, meta.totalPages);
+
+  return (
+    <nav
+      aria-label="My payments pagination"
+      className="relative z-10 mt-5 flex w-full flex-col items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:flex-row"
+    >
+      <p className="text-sm text-gray-600">
+        Page {meta.page} of {Math.max(meta.totalPages, 1)}
+      </p>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <PaymentPaginationLink
+          disabled={!meta.hasPreviousPage}
+          href={buildMyPaymentsHref(meta.page - 1)}
+          label="Previous"
+        />
+        <div className="flex items-center gap-2">
+          {pages.map((page) => (
+            <Link
+              aria-current={page === meta.page ? "page" : undefined}
+              className={[
+                "inline-flex size-9 items-center justify-center rounded-md border text-sm",
+                page === meta.page
+                  ? "border-gray-950 bg-gray-950 text-white"
+                  : "border-gray-200 text-gray-950 hover:border-gray-950",
+              ].join(" ")}
+              href={buildMyPaymentsHref(page)}
+              key={page}
+            >
+              {page}
+            </Link>
+          ))}
+        </div>
+        <PaymentPaginationLink
+          disabled={!meta.hasNextPage}
+          href={buildMyPaymentsHref(meta.page + 1)}
+          label="Next"
+        />
+      </div>
+    </nav>
+  );
+}
+
+function PaymentPaginationLink({
+  disabled,
+  href,
+  label,
+}: {
+  disabled: boolean;
+  href: string;
+  label: string;
+}) {
+  if (disabled) {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-gray-200 px-4 text-sm text-gray-500 opacity-60">
+        {label}
+      </span>
+    );
+  }
+
+  return (
+    <Link
+      className="inline-flex min-h-9 items-center justify-center rounded-md border border-gray-200 px-4 text-sm font-semibold text-gray-950 transition hover:border-gray-950"
+      href={href}
+    >
+      {label}
+    </Link>
+  );
+}
+
+function buildMyPaymentsHref(page: number) {
+  const params = new URLSearchParams();
+
+  if (page > 1) {
+    params.set("page", String(page));
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `/my-payments?${queryString}` : "/my-payments";
+}
+
+function getVisiblePages(currentPage: number, totalPages: number) {
+  const start = Math.max(1, currentPage - 2);
+  const end = Math.min(totalPages, currentPage + 2);
+  const pages: number[] = [];
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  return pages;
 }

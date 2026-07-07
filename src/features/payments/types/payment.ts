@@ -1,3 +1,5 @@
+import type { PaginationMeta } from "@/features/courses/types/course";
+
 export type VnpayLocale = "vn" | "en";
 
 export type CreateVnpayPaymentUrlInput = {
@@ -78,6 +80,12 @@ export interface PaymentHistoryItem {
   course: PaymentHistoryCourse;
 }
 
+export type MyPaymentsQuery = {
+  limit?: number;
+  page?: number;
+};
+
 export interface GetPaymentsResponse {
-  payments: PaymentHistoryItem[];
+  data: PaymentHistoryItem[];
+  meta: PaginationMeta;
 }

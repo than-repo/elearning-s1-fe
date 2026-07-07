@@ -7,6 +7,7 @@ import type {
   SimulationPaymentResult,
   VnpayReturnResult,
   GetPaymentsResponse,
+  MyPaymentsQuery,
 } from "../types/payment";
 
 const paymentDevHeaders: HeadersInit = { "ngrok-skip-browser-warning": "true" };
@@ -78,9 +79,28 @@ export function failSimulationPayment(paymentId: string, accessToken: string) {
   );
 }
 
-export function getMyPayments(accessToken: string) {
-  return apiRequest<GetPaymentsResponse>(`/payments/me`, {
-    method: "GET",
-    accessToken,
-  });
+export function getMyPayments(query: MyPaymentsQuery, accessToken: string) {
+  return apiRequest<GetPaymentsResponse>(
+    `/payments/me${buildMyPaymentsQueryString(query)}`,
+    {
+      method: "GET",
+      accessToken,
+    },
+  );
+}
+
+function buildMyPaymentsQueryString(query: MyPaymentsQuery) {
+  const params = new URLSearchParams();
+
+  if (query.page !== undefined && query.page !== null) {
+    params.set("page", String(query.page));
+  }
+
+  if (query.limit !== undefined && query.limit !== null) {
+    params.set("limit", String(query.limit));
+  }
+
+  const queryString = params.toString();
+
+  return queryString ? `?${queryString}` : "";
 }

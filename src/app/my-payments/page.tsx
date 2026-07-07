@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 const navLinks = [
   { href: "/courses", label: "Courses" },
   { href: "/my-courses", label: "My Courses" },
-  { href: "/my-payments", label: "My Payments" },
 ];
 
 export default function MyPaymentsPage() {
