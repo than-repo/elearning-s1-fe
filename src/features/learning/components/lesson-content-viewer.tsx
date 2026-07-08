@@ -1,4 +1,4 @@
-import type { LearningFile, LearningLesson } from "../types/learning-course";
+import type { LearningFile, LearningLessonDetail } from "../types/learning-course";
 import { getYoutubeEmbedUrl } from "../utils/media-url";
 import {
   mediaTypeLabels,
@@ -7,7 +7,7 @@ import {
 } from "../utils/learning-course";
 
 type LessonContentViewerProps = {
-  lesson: LearningLesson;
+  lesson: LearningLessonDetail;
   sectionTitle: string;
 };
 

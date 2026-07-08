@@ -6,8 +6,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { ApiError } from "@/lib/api/client";
 
-import { getCourseLearning } from "../api/learning-course-api";
-import type { CourseLearningResponse } from "../types/learning-course";
+import { getLearningCourseOverview } from "../api/learning-course-api";
+import type { LearningCourseOverview } from "../types/learning-course";
 import {
   LearningAccessState,
   LearningPageSkeleton,
@@ -31,7 +31,7 @@ export function CourseLearningContent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { accessToken, status, user } = useAuth();
-  const [course, setCourse] = useState<CourseLearningResponse | null>(null);
+  const [course, setCourse] = useState<LearningCourseOverview | null>(null);
   const [error, setError] = useState<LearningLoadState>(null);
   const [requestedCourseId, setRequestedCourseId] = useState<string | null>(
     null,
@@ -59,7 +59,7 @@ export function CourseLearningContent({
 
     let isMounted = true;
 
-    getCourseLearning(courseId, accessToken)
+    getLearningCourseOverview(courseId, accessToken)
       .then((nextCourse) => {
         if (!isMounted) {
           return;
@@ -159,5 +159,16 @@ export function CourseLearningContent({
     return <LearningPageSkeleton />;
   }
 
-  return <LearningCoursePage activeLessonId={activeLessonId} course={course} />;
+  if (!accessToken) {
+    return <LearningPageSkeleton />;
+  }
+
+  return (
+    <LearningCoursePage
+      accessToken={accessToken}
+      activeLessonId={activeLessonId}
+      course={course}
+      courseSlug={courseSlug}
+    />
+  );
 }

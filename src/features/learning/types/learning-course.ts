@@ -36,6 +36,61 @@ export type CourseLearningResponse = {
   title: string;
 };
 
+export type LearningPaginationMeta = {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  limit: number;
+  page: number;
+  total: number;
+  totalPages: number;
+};
+
+export type LearningPaginationQuery = {
+  limit?: number;
+  page?: number;
+};
+
+export type LearningCourseOverview = {
+  contentSummary: {
+    lessonCount: number;
+    sectionCount: number;
+  };
+  id: string;
+  progressPercentage: number;
+  shortDescription: string;
+  slug: string;
+  thumbnailUrl?: string | null;
+  title: string;
+};
+
+export type LearningSectionSummary = {
+  description?: string | null;
+  id: string;
+  lessonCount: number;
+  sectionIndex: number;
+  title: string;
+};
+
+export type LearningLessonSummary = {
+  description?: string | null;
+  fileCount: number;
+  id: string;
+  lessonIndex: number;
+  title: string;
+};
+
+export type LearningLessonDetail = LearningLesson;
+
+export type LearningSectionsResponse = {
+  data: LearningSectionSummary[];
+  meta: LearningPaginationMeta;
+};
+
+export type LearningSectionLessonsResponse = {
+  data: LearningLessonSummary[];
+  meta: LearningPaginationMeta;
+};
+
 export type LearningAssessmentType = "QUIZ" | "PROJECT";
 
 export type LearningAssessmentStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { LearningFile, LearningLesson } from "../types/learning-course";
+import type { LearningFile, LearningLessonDetail } from "../types/learning-course";
 import {
   mediaTypeClasses,
   mediaTypeLabels,
@@ -12,7 +12,7 @@ import {
 type LearningTab = "overview" | "resources";
 
 type LessonTabsProps = {
-  lesson: LearningLesson;
+  lesson: LearningLessonDetail;
 };
 
 export function LessonTabs({ lesson }: LessonTabsProps) {
@@ -75,7 +75,7 @@ function TabButton({
   );
 }
 
-function LessonOverview({ lesson }: { lesson: LearningLesson }) {
+function LessonOverview({ lesson }: { lesson: LearningLessonDetail }) {
   return (
     <div className="grid gap-5">
       <div>

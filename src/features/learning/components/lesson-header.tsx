@@ -1,28 +1,38 @@
 import Link from "next/link";
 
-import type { LessonBundle } from "../utils/learning-course";
+import type {
+  LearningLessonDetail,
+  LearningLessonSummary,
+} from "../types/learning-course";
 
 type LessonHeaderProps = {
   courseSlug: string;
-  lessonBundle: LessonBundle;
-  nextBundle: LessonBundle | null;
-  previousBundle: LessonBundle | null;
+  lesson: LearningLessonDetail;
+  lessonNumber: number;
+  nextLesson: LearningLessonSummary | null;
+  previousLesson: LearningLessonSummary | null;
+  sectionNumber?: number;
+  sectionTitle: string;
 };
 
 export function LessonHeader({
   courseSlug,
-  lessonBundle,
-  nextBundle,
-  previousBundle,
+  lesson,
+  lessonNumber,
+  nextLesson,
+  previousLesson,
+  sectionNumber,
+  sectionTitle,
 }: LessonHeaderProps) {
-  const { lesson, lessonNumber, section, sectionNumber } = lessonBundle;
-
   return (
     <section className="rounded-lg border border-border bg-card p-4 shadow-sm sm:p-5">
       <div className="flex flex-wrap gap-2 text-sm font-semibold">
-        <span className="rounded-md border border-border bg-surface-pearl px-3 py-1">
-          Section {sectionNumber}
-        </span>
+        {sectionNumber ? (
+          <span className="rounded-md border border-border bg-surface-pearl px-3 py-1">
+            Section {sectionNumber}
+          </span>
+        ) : null}
+
         <span className="rounded-md border border-border bg-background px-3 py-1">
           Lesson {lessonNumber}
         </span>
@@ -33,7 +43,7 @@ export function LessonHeader({
       </h2>
 
       <p className="mt-2 break-words text-sm font-semibold text-ink-muted">
-        {section.title}
+        {sectionTitle}
       </p>
 
       {lesson.description ? (
@@ -42,25 +52,25 @@ export function LessonHeader({
         </p>
       ) : null}
 
-      {(previousBundle || nextBundle) && (
+      {(previousLesson || nextLesson) && (
         <nav
           aria-label="Lesson navigation"
           className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
         >
-          {previousBundle && (
+          {previousLesson && (
             <LessonNavigationLink
-              href={getLessonHref(courseSlug, previousBundle.lesson.id)}
+              href={getLessonHref(courseSlug, previousLesson.id)}
               label="Previous"
-              title={previousBundle.lesson.title}
+              title={previousLesson.title}
             />
           )}
 
-          {nextBundle && (
+          {nextLesson && (
             <LessonNavigationLink
               align="right"
-              href={getLessonHref(courseSlug, nextBundle.lesson.id)}
+              href={getLessonHref(courseSlug, nextLesson.id)}
               label="Next"
-              title={nextBundle.lesson.title}
+              title={nextLesson.title}
             />
           )}
         </nav>
